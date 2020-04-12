@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.goods.dao.GoodsDao">
+
+    <!--统计商品数量-->
+    <select id="countGoodsId" parameterType ="com.xzsd.pc.goods.entity.GoodsInfo" resultType ="int">
+        select count(goods_id)
+        from t_goods_info
+        where is_deleted = 0
+        and goods_code = #{goodsCode}
+    </select>
+
+    <!--新增商品-->
+    <insert id ="addGoods" parameterType="com.xzsd.pc.goods.entity.GoodsInfo">
+        insert into t_goods_info
+        (
+        goods_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        goods_code,
+        goods_name,
+        goods_fix_price,
+        goods_cost_price,
+        goods_sale_price,
+        goods_stock,
+        goods_sale_sum,
+        goods_cate_code,
+        goods_advertisement,
+        goods_description,
+        goods_condition,
+        goods_sale_time,
+        goods_visit_num,
+        goods_business,
+        goods_business_code,
+        goods_isbn,
+        goods_publisher,
+        goods_author,
+        goods_star )
+
+        values
+        (#{goodsId},
+        #{createTime},
+        #{createPerson},
+        #{updateTime},
+        #{updatePerson},
+        #{version},
+        #{isDeleted},
+        #{goodsCode},
+        #{goodsName},
+        #{goodsFixPrice},
+        #{goodsCostPrice},
+        #{goodsSalePrice},
+        #{goodsStock},
+        #{goodsSaleSum},
+        #{goodsCateCode},
+
+        #{goodsAdvertisement},
+        #{goodsDescription},
+        #{goodsCondition},
+        #{goodsSaleTime},
+        #{goodsVisitNum},
+
+        #{goodsBusiness},
+        #{goodsBusinessCode},
+        #{goodsIsbn},
+        #{goodsPublisher},
+        #{goodsAuthor},
+        #{goodsStar} )
+    </insert>
+
+
+    <!--商品列表-->
+    <select id="listGoodsByPage" parameterType="com.xzsd.pc.goods.entity.GoodsInfo" resultType="com.xzsd.pc.goods.entity.GoodsInfo">
+        select
+        a.is_deleted isDeleted,
+        a.goods_code goodsCode,
+        a.goods_name goodsName,
+        a.goods_fix_price goodsFixPrice,
+        a.goods_cost_price goodsCostPrice,
+        a.goods_sale_price goodsSalePrice,
+        a.goods_stock goodsStock,
+        a.goods_sale_sum goodsSaleSum,
+        a.goods_cate_code goodsCateCode,
+        a.goods_advertisement goodsAdvertisement,
+        a.goods_description goodsDescription,
+        a.goods_condition goodsCondition,
+        a.goods_sale_time goodsSaleTime,
+        a.goods_visit_num goodsVisitNum,
+        a.goods_business goodsBusiness,
+        a.goods_business_code goodsBusiness,
+        a.goods_isbn goodsIsbn,
+        a.goods_publisher goodsPublisher,
+        a.goods_author goodsAuthor,
+        a.goods_star goodsStar
+
+        from t_goods_info a
+        where a.is_deleted = 0
+        <if test="goodsId != null and goodsId != ''">
+            and a.goods_id like concat('%', #{goodsId}, '%')
+        </if>
+        <if test="goodsName != null and goodsName != ''">
+            and a.goods_name like concat('%', #{goodsName}, '%')
+        </if>
+        order by create_time desc
+    </select>
+
+
+
+    <!--修改商品信息-->
+    <update id="updateGoods" parameterType="com.xzsd.pc.goods.entity.GoodsInfo">
+        update t_goods_info
+        set
+        goods_id = #{goodsId},
+        create_time = #{createTime},
+        create_person = #{createPerson},
+        update_time = #{updateTime},
+        update_person = #{updatePerson},
+        is_deleted = #{isDeleted},
+        goods_code = #{goodsCode},
+        goods_name = #{goodsName},
+        goods_fix_price = #{goodsFixPrice},
+        goods_cost_price = #{goodsCostPrice},
+        goods_sale_price = #{goodsSalePrice},
+        goods_stock = #{goodsStock},
+        goods_sale_sum = #{goodsSaleSum},
+        goods_cate_code = #{goodsCateCode},
+        goods_advertisement = #{goodsAdvertisement},
+        goods_description = #{goodsDescription},
+        goods_condition = #{goodsCondition},
+        goods_sale_time = #{goodsSaleTime},
+        goods_visit_num = #{goodsVisitNum},
+        goods_business = #{goodsBusiness},
+        goods_business_code = #{goodsBusinessCode},
+        goods_isbn = #{goodsIsbn},
+        goods_publisher = #{goodsPublisher},
+        goods_author = #{goodsAuthor},
+        goods_star = #{goodsStar},
+        version      = version + 1
+
+        where goods_id = #{goodsId}
+        and version = #{version}
+    </update>
+
+
+    <!--删除商品-->
+    <update id="deleteGoods" parameterType="com.xzsd.pc.goods.entity.GoodsInfo">
+        update t_goods_info
+        set
+        is_deleted = 1,
+        update_time = now(),
+        update_person   = #{userid},
+        version = version + 1
+        where goods_id in
+        <foreach item="item" index="index" collection="listCode" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--修改商品状态-->
+    <update id = "updateGoodsCondition" parameterType="com.xzsd.pc.goods.entity.GoodsInfo">
+        update t_goods_info
+        set
+        goods_condition = #{goodsCondition}
+        where goods_code = #{goodsCode}
+
+    </update>
+
+
+
+
+</mapper>

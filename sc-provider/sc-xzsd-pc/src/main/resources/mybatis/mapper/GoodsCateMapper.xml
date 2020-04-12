@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.goodsCate.dao.GoodsCateDao">
+
+    <!--统计商品分类数量-->
+    <select id="countCateId" parameterType ="com.xzsd.pc.goodsCate.entity.GoodsCateInfo" resultType ="int">
+        select count(cate_name)
+        from t_goods_cate_info
+        where is_deleted = 0
+        and cate_name = #{cateName}
+    </select>
+
+    <!--新增商品-->
+    <insert id ="addGoodsCate" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+        insert into t_goods_cate_info
+        (
+        goods_cate_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        cate_name,
+        cate_level,
+        cate_parent,
+        cate_comment)
+
+        values
+        (#{cateId},
+        #{createTime},
+        #{createPerson},
+        #{updateTime},
+        #{updatePerson},
+        #{version},
+        #{isDeleted},
+        #{cateName},
+        #{cateLevel},
+        #{cateParentCode},
+        #{cateComment})
+    </insert>
+
+    <!--商品分类列表-->
+    <select id="listGoodsCateByPage" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo" resultType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+        select
+        a.goods_cate_id cateId,
+        a.create_time caretrTime,
+        a.create_person createPerson,
+        a.update_time updateTime,
+        a.update_person updatePerson,
+        a.version version,
+        a.is_deleted isDeleted,
+        a.cate_name cateName,
+        a.cate_level cateLevel,
+        a.cate_parent cateParent,
+        a.cate_comment cateComment
+
+        from t_goods_cate_info a
+        where a.is_deleted = 0
+        <if test="cateId != null and cateId != ''">
+            and a.goods_cate_id like concat('%', #{cateId}, '%')
+        </if>
+        <if test="cateName != null and cateName != ''">
+            and a.cate_name like concat('%', #{cateName}, '%')
+        </if>
+        order by create_time desc
+    </select>
+
+
+    <!--获取商品分类信息-->
+    <select id="findGoodsCateById" parameterType="java.lang.String" resultType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+        select
+        goods_cate_id cateId,
+        create_time createTime,
+        create_person createPerson,
+        update_time updateTime,
+        update_person updatePerson,
+        version version,
+        is_deleted isDeleted,
+        cate_name cateName,
+        cate_level cateLevel,
+        cate_parent cateParent,
+        cate_comment cateComment
+        from t_goods_cate_info
+        where goods_cate_id = #{cateId}
+        and is_deleted = 0
+    </select>
+
+
+    <!--修改商品分类信息-->
+    <update id="updateGoodsCateById" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+        update t_goods_cate_info
+        set
+        goods_cate_id = #{cateId},
+        create_time = #{createTime},
+        create_person = #{createPerson},
+        update_time = #{updateTime},
+        update_person = #{updatePerson},
+        is_deleted = #{isDeleted},
+        cate_name = #{cateName},
+        cate_level = #{cateLevel},
+        cate_parent = #{cateParentCode},
+        cate_comment = #{cateComment},
+        version = version + 1
+
+        where goods_cate_id = #{cateId}
+        and version = #{version}
+    </update>
+
+
+    <!--删除商品分类-->
+    <update id="deleteGoodsCateById" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+        update t_goods_cate_info
+        set
+        is_deleted = 1,
+        update_time = now(),
+        update_person   = #{cateid},
+        version = version + 1
+        where goods_cate_id in
+        <foreach item="item" index="index" collection="listCode" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+
+</mapper>

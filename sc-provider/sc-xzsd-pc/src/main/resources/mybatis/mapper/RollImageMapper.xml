@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.rollImage.dao.RollImageDao">
+
+    <!--统计轮播图数量-->
+    <select id="countRollImage" parameterType ="com.xzsd.pc.rollImage.entity.RollImageInfo" resultType ="int">
+        select count(roll_image_id)
+        from t_roll_image
+        where is_deleted = 0
+        and roll_image_code = #{rollImageCode}
+    </select>
+
+    <!--新增轮播图-->
+    <insert id ="addRollImage" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo">
+        insert into t_roll_image
+        (
+        roll_image_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        roll_image_code,
+        roll_image_weight,
+        roll_image_goods_code,
+        roll_image_begin_date,
+        roll_image_end_date,
+        roll_image_condition,
+        roll_image_imageFileUrl)
+
+        values
+        (#{rollImageId},
+        #{createTime},
+        #{createPerson},
+        #{updateTime},
+        #{updatePerson},
+        #{version},
+        #{isDeleted},
+        #{rollImageCode},
+        #{rollImageWeight},
+        #{rollImageGoodsCode},
+        #{rollImageBeginDate},
+        #{rollImageEndDate},
+        #{rollImageCondition},
+        #{imageFileUrl})
+    </insert>
+
+    <!--轮播图列表-->
+    <select id="listRollImages" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo" resultType="com.xzsd.pc.rollImage.entity.RollImageInfo">
+        select
+        a.roll_image_id rollImageId,
+        a.roll_image_code rollImageCode,
+        a.roll_image_weight rollImageWeight,
+        a.roll_image_goods_code rollImageGoodsCode,
+        a.roll_image_begin_date rollImageBeginDate,
+        a.roll_image_end_date rollImageEndDate,
+        a.roll_image_condition rollImageCondition,
+        a.roll_image_imageFileUrl rollImageImageFilUrl
+
+        from t_roll_image a
+        where a.is_deleted = 0
+        <if test="rollImageId != null and rollImageId != ''">
+            and a.roll_image_id like concat('%', #{rollImageId}, '%')
+        </if>
+        order by create_time desc
+    </select>
+
+
+
+    <!--修改轮播图状态-->
+    <update id="updateRollImageConditionById" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo">
+        update t_roll_image
+        set
+        roll_image_id = #{rollImageCondition},
+        version = version + 1
+
+        where roll_image_id = #{rollImageId}
+        and version = #{version}
+    </update>
+
+
+    <!--删除轮播图-->
+    <update id="deleteRollImageById" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo">
+        update t_roll_image
+        set
+        is_deleted = 1,
+        update_time = now(),
+        update_person   = #{roll_image_id},
+        version = version + 1
+        where roll_image_id in
+        <foreach item="item" index="index" collection="listCode" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+
+</mapper>

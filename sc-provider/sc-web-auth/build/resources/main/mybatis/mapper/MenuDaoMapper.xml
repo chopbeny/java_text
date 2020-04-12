@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.neusoft.webauth.menu.dao.MenuDao">
+
+    <!--统计菜单数量-->
+    <select id="countMenu" parameterType="com.neusoft.webauth.menu.entity.Menu" resultType="int">
+        select count(menu_id)
+        from t_menu
+        where is_deleted = 0
+        and menu_id = #{menuId}
+    </select>
+
+
+    <!--新增菜单-->
+    <insert id="addMenu" parameterType="com.neusoft.webauth.menu.entity.Menu">
+        insert into t_menu
+        (menu_id,
+         create_time,
+         create_person,
+         version,
+         is_deleted,
+         menu_name,
+         menu_route,
+         menu_comment
+         )
+        values
+           (#{menuId},
+            now(),
+            #{createPerson},
+            #{version},
+            #{isDeleted},
+            #{menuName},
+            #{menuRoute},
+            #{menuComment}
+            )
+    </insert>
+    <!--获取菜单详情-->
+    <select id="getMenu" parameterType="java.lang.String" resultType="com.neusoft.webauth.menu.entity.Menu">
+        select
+         menu_name,
+         menu_comment,
+         menu_route,
+         version
+        from t_menu
+        where menu_id = #{menuId}
+        and is_deleted = 0
+    </select>
+    <!--菜单列表-->
+    <select id="listUsersByPage" parameterType="com.neusoft.webauth.menu.entity.Menu" resultType="com.neusoft.webauth.menu.entity.Menu">
+        select
+        a.menu_id menuId,
+        a.menu_name menuName,
+        a.version version
+        from t_menu a
+        where a.is_deleted = 0
+        order by create_time desc
+    </select>
+    <!--修改菜单信息-->
+    <update id="updateMenu" parameterType="com.neusoft.webauth.menu.entity.Menu">
+        update t_menu
+        set
+            menu_id = #{munuId},
+            menu_name = #{menuName},
+            menu_route = #{menuRoute},
+            menu_comment = #{menuComment},
+            update_time = now(),
+            update_person = #{updatePerson},
+            version      = version + 1
+        where menu_id = #{menuId}
+          and version = #{version}
+    </update>
+
+    <!--删除菜单-->
+    <update id="deleteMenu" parameterType="com.neusoft.webauth.menu.entity.Menu">
+        update t_menu
+        set is_deleted     = 1,
+        update_time = now(),
+        update_person   = #{updatePerson},
+        version = version + 1
+        where menu_Id in
+        <foreach item="item" index="index" collection="menuList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+</mapper>
