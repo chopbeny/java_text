@@ -5,12 +5,14 @@ import com.neusoft.util.StringUtil;
 import com.neusoft.util.UUIDUtils;
 import com.xzsd.pc.user.dao.UserDao;
 import com.xzsd.pc.user.entity.UserInfo;
+import com.xzsd.pc.user.entity.UserSettingDTO;
 import com.xzsd.pc.util.PasswordUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.neusoft.core.page.PageUtils.getPageInfo;
@@ -44,10 +46,10 @@ public class UserService {
         }
         // 密码加密 默认为123456
         String pwd = PasswordUtils.generatePassword("123456");
-        userInfo.setUserCode(StringUtil.getCommonCode(2));
+        userInfo.setUserId(StringUtil.getCommonCode(2));
         userInfo.setUserPassword(pwd);
         userInfo.setisDeleted(0);
-        userInfo.setUserCode(UUIDUtils.getUUID());
+       // userInfo.setUserId(UUIDUtils.getUUID());
         // 新增用户
         int count = userDao.saveUser(userInfo);
         if(0 == count) {
@@ -105,24 +107,32 @@ public class UserService {
         return appResponse;
     }
 
-    /**
-     * 功能：删除用户信息
-     * 描述：略
-     * 作成者：邓嘉豪
-     * 作成时间：2020/4/11
-     * @param userInfo
-     */
+    /*
+     * user 删除用户
+     * @param userId
+     * @param userid
+     * @return
+     * @Author 邓嘉豪
+     * @Date 2020-03-26
+
+*/
+
     @Transactional(rollbackFor = Exception.class)
-    public AppResponse deleteUser(UserInfo userInfo) {
+    public AppResponse deleteUser(UserSettingDTO userSettingDTO) {
         AppResponse appResponse = AppResponse.success("删除成功！");
         // 删除用户
-        int count = userDao.deleteUser(userInfo);
+        int count = userDao.deleteUser(userSettingDTO);
         if(0 == count) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();// 回滚
             appResponse = AppResponse.bizError("删除失败，请重试！");
         }
         return appResponse;
     }
+
+
+
+
+
 
     /**
      * 功能：修改密码
@@ -136,7 +146,7 @@ public class UserService {
         if(null != userInfo.getUserpassword() && !"".equals(userInfo.getUserpassword())) {
             String oldPwd = PasswordUtils.generatePassword(userInfo.getUserpassword());
             // 获取用户信息
-            UserInfo userDetail = userDao.getUserById(userInfo.getUserCode());
+            UserInfo userDetail = userDao.getUserById(userInfo.getUserId());
 
             if(null == userDetail) {
                 return AppResponse.bizError("用户不存在或已被删除！");

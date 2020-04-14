@@ -1,6 +1,9 @@
 package com.xzsd.pc.driver.controller;
 
+import com.neusoft.core.exception.ScServerException;
+import com.neusoft.security.client.utils.SecurityUtils;
 import com.xzsd.pc.driver.entity.DriverInfo;
+import com.xzsd.pc.driver.entity.DriverSettingDTO;
 import com.xzsd.pc.driver.service.DriverService;
 import com.xzsd.pc.util.AppResponse;
 import com.xzsd.pc.util.AuthUtils;
@@ -118,27 +121,24 @@ public class DriverController {
     }
 
     /**
-     * demo 删除司机
-     *
-     * @param driverNo
+     * 删除司机
      * @return AppResponse
      * @author 邓嘉豪
      * @Date 2020-03-26
      */
+
     @PostMapping("deleteDriver")
-    public AppResponse deleteDriver(String driverNo) {
+    public AppResponse deleteDriver(DriverSettingDTO driverSettingDTO) {
         try {
             //获取用户id
-            String driverid = AuthUtils.getCurrentUserId();
-            return driverService.deleteDriver(driverNo, driverid);
+            String userId = SecurityUtils.getCurrentUserId();
+            driverSettingDTO.setLastModifiedBy(userId);
+            return driverService.deleteDriver(driverSettingDTO);
         } catch (Exception e) {
             logger.error("用户删除错误", e);
-            System.out.println(e.toString());
-            throw e;
+            throw new ScServerException("用户删除错误");
         }
     }
-
-
 
 
 }

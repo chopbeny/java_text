@@ -19,4 +19,8 @@ public class AuthUtils {
     public static String getCurrentGoodsId() {
         return "1";
     }
+
+    public static String getCurrentStoreId() {
+        return "2";
+    }
 }

@@ -2,6 +2,8 @@ package com.xzsd.pc.driver.dao;
 
 import com.xzsd.pc.driver.entity.DriverInfo;
 import com.xzsd.pc.driver.entity.DriverInfo;
+import com.xzsd.pc.driver.entity.DriverSettingDTO;
+import com.xzsd.pc.user.entity.UserSettingDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -60,12 +62,10 @@ public interface DriverDao {
 
     /**
      * 删除司机信息
-     *
-     * @param listCode 选中的用户编号集合
-     * @param driverid 更新人
+     * @param driverSettingDTO 选中的用户信息
      * @return
      */
-    int deleteDriver(List<String> listCode, @Param("driverid") String driverid);
+    int deleteDriver(DriverSettingDTO driverSettingDTO);
 
 
 }

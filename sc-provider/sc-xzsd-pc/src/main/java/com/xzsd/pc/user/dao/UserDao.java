@@ -2,6 +2,7 @@ package com.xzsd.pc.user.dao;
 
 
 import com.xzsd.pc.user.entity.UserInfo;
+import com.xzsd.pc.user.entity.UserSettingDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -41,12 +42,16 @@ public interface UserDao {
      */
     int updateUser(UserInfo userInfo);
 
-    /**
+
+/**
      * 删除用户信息
      * @param userSettingDTO 选中的用户信息
      * @return
-     */
-    int deleteUser(UserInfo userSettingDTO);
+*/
+    int deleteUser(UserSettingDTO userSettingDTO);
+
+
+
 
     /**
      * 修改密码

@@ -4,7 +4,9 @@ import com.neusoft.core.exception.ScServerException;
 import com.neusoft.core.restful.AppResponse;
 import com.neusoft.security.client.utils.SecurityUtils;
 import com.xzsd.pc.user.entity.UserInfo;
+import com.xzsd.pc.user.entity.UserSettingDTO;
 import com.xzsd.pc.user.service.UserService;
+import com.xzsd.pc.util.AuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -59,7 +61,7 @@ public class UserController {
      * 作成者：邓嘉豪
      * 作成时间：2020/4/11
      */
-//    @SystemLog1(operation = "获取用户列表。。。。。")
+
     @RequestMapping(value = "listUsers")
     public AppResponse listUsers(UserInfo userInfo) {
         try {
@@ -70,24 +72,32 @@ public class UserController {
         }
     }
 
-    /**
-     * 功能：删除用户信息
-     * 描述：略
-     * 作成者：邓嘉豪
-     * 作成时间：2020/4/11
-     */
+    /*
+     * user 删除用户
+     *
+     * @param userId
+     * @return AppResponse
+     * @author 邓嘉豪
+     * @Date 2020-03-26
+
+*/
+
     @PostMapping("deleteUser")
-    public AppResponse deleteUser(UserInfo userInfo) {
+    public AppResponse deleteUser(UserSettingDTO userSettingDTO) {
         try {
             //获取用户id
             String userId = SecurityUtils.getCurrentUserId();
-            userInfo.setupdatePerson(userId);
-            return userService.deleteUser(userInfo);
+            userSettingDTO.setLastModifiedBy(userId);
+            return userService.deleteUser(userSettingDTO);
         } catch (Exception e) {
             logger.error("用户删除错误", e);
             throw new ScServerException("用户删除错误");
         }
     }
+
+
+
+
 
     /**
      * 功能：修改密码

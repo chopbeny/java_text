@@ -3,12 +3,13 @@ import com.xzsd.pc.driver.dao.DriverDao;
 import com.xzsd.pc.driver.entity.DriverInfo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.xzsd.pc.driver.entity.DriverSettingDTO;
 import com.xzsd.pc.util.AppResponse;
-import com.xzsd.pc.util.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -157,25 +158,23 @@ public class DriverService {
 
 
     /**
-     * demo 删除司机
-     *
-     * @param driverNo
-     * @param driverid
+     * 删除司机
      * @return
      * @Author 邓嘉豪
      * @Date 2020-03-26
      */
     @Transactional(rollbackFor = Exception.class)
-    public AppResponse deleteDriver(String driverNo, String driverid) {
-        List<String> listCode = Arrays.asList(driverNo.split(","));
+    public AppResponse deleteDriver(DriverSettingDTO driverSettingDTO) {
         AppResponse appResponse = AppResponse.success("删除成功！");
         // 删除用户
-        int count = driverDao.deleteDriver(listCode, driverid);
-        if (0 == count) {
+        int count = driverDao.deleteDriver(driverSettingDTO);
+        if(0 == count) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();// 回滚
             appResponse = AppResponse.bizError("删除失败，请重试！");
         }
         return appResponse;
     }
+
 
 
 }

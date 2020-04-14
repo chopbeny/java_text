@@ -7,17 +7,12 @@ import java.util.Date;
  * @Author 邓嘉豪
  * @Date 2020-03-27
  */
-public class DriverInfo implements Serializable {
+public class DriverInfo{
 
     /**
      * 司机唯一标识id
      */
     public String driverId;
-
-    /**
-     * 司机编号
-     */
-    public String driverClientCode;
 
     /**
      * 页码
@@ -84,9 +79,6 @@ public class DriverInfo implements Serializable {
         this.driverId = driverId;
     }
 
-    public String getdriverClientCode(){return driverClientCode; }
-
-    public void setdriverClientCode(String driverClientCode){this.driverClientCode = driverClientCode; }
 
     public String getdriverProvinceCode(){return driverProvinceCode; }
 

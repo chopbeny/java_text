@@ -3,8 +3,13 @@ package com.xzsd.pc.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
+import java.util.List;
 
 public class UserInfo {
+    /**
+     * 用户列表
+     */
+    private List<String> userList;
     /**
      * 用户id
      */
@@ -13,10 +18,7 @@ public class UserInfo {
      * 用户名称
      */
     private String userName;
-    /**
-     * 用户登录名
-     */
-    private String userCode;
+
     /**
      * 用户密码
      */
@@ -93,18 +95,6 @@ public class UserInfo {
     private String version;
 
 
-
-
-
-
-
-    public String getUserCode() {
-        return userCode;
-    }
-
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
-    }
 
     public String getUserName() {
         return userName;
@@ -250,4 +240,15 @@ public class UserInfo {
     public void setisDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    public List<String> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<String> userList) {
+        this.userList = userList;
+    }
+
+
+
 }
