@@ -8,8 +8,7 @@ import java.util.Date;
 
 /**
  * 图片信息实体类
- * 继承BaseEntity获取公有属性
- *
+
  * @author 邓嘉豪
  * @date 2020-03-27
  */
