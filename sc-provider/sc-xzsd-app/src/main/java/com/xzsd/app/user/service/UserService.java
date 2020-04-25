@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 
 /**
- * 客户管理业务处理类
+ * 用户管理业务处理类
  *
  * @author 邓嘉豪
  * @date 2020-04-12
@@ -32,7 +32,7 @@ public class UserService {
 
 
     /**
-     * 新增用户接口
+     * 新增用户接口（注册）
      * @param user 用户信息
      * @param imageId 上传的头像图片编号
      * @author 邓嘉豪
