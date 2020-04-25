@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 轮播图业务处理类
  *
  * @author 邓嘉豪
  * @date 2020-04-14
