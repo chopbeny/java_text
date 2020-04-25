@@ -1,7 +1,6 @@
 package com.xzsd.app.home.entity;
 /**
  * 轮播图实体类
- * 继承BaseEntity获取公有属性
  *
  * @author 邓嘉豪
  * @date 2020-03-27
