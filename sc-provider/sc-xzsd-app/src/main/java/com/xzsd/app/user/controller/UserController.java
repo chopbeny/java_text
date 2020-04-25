@@ -26,7 +26,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     /**
-     * 新增用户接口
+     * 新增用户接口（注册）
      * @param user 用户信息
      * @param imageId 上传的头像图片编号
      * @作者 邓嘉豪
