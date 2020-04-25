@@ -1,156 +1,159 @@
 package com.xzsd.pc.user.controller;
 
 import com.neusoft.core.exception.ScServerException;
-import com.neusoft.core.restful.AppResponse;
-import com.neusoft.security.client.utils.SecurityUtils;
-import com.xzsd.pc.user.entity.UserInfo;
-import com.xzsd.pc.user.entity.UserSettingDTO;
+import com.xzsd.pc.user.entity.User;
 import com.xzsd.pc.user.service.UserService;
-import com.xzsd.pc.util.AuthUtils;
+import com.xzsd.pc.util.AppResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 /**
- * @ClassName UserController
- * @Description 用户管理
- * @Author zhu.qf@neusoft.com
- * @Date 2020/4/11
+ * 用户管理控制器
+ *
+ * @author 邓嘉豪
+ * @date 2020-03-27
  */
 @RestController
 @RequestMapping("/user")
-@Validated
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @Resource
+    @Autowired
     private UserService userService;
 
-    /**
-     * 功能：新增用户
-     * 描述：略
-     * 作成者：邓嘉豪
-     * 作成时间：2020/4/11
-     */
-//    @SystemLog1(operation = "新增用户信息测试操作。。。。。")
-    @PostMapping("saveUser")
-    public AppResponse saveUser(@Valid UserInfo userInfo) {
-        try {
-            //获取用户id
-            String userId = SecurityUtils.getCurrentUserId();
-            userInfo.setcreatePerson(userId);
-            AppResponse appResponse = userService.saveUser(userInfo);
-            return appResponse;
-        } catch (Exception e) {
-            logger.error("用户注册失败", e);
-            throw new ScServerException(e);
-        }
-    }
 
     /**
-     * 功能：获取用户列表
-     * 描述：略
-     * 作成者：邓嘉豪
-     * 作成时间：2020/4/11
-     */
-
-    @RequestMapping(value = "listUsers")
-    public AppResponse listUsers(UserInfo userInfo) {
-        try {
-            return userService.listUsers(userInfo);
-        } catch (Exception e) {
-            logger.error("用户获取异常", e);
-            throw new ScServerException("查询错误，请重试");
-        }
-    }
-
-    /*
-     * user 删除用户
+     * 顶部栏接口
      *
-     * @param userId
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-26
-
-*/
-
-    @PostMapping("deleteUser")
-    public AppResponse deleteUser(UserSettingDTO userSettingDTO) {
+     * @return
+     */
+    @PostMapping("/topInfo")
+    public AppResponse topInfo() {
         try {
-            //获取用户id
-            String userId = SecurityUtils.getCurrentUserId();
-            userSettingDTO.setLastModifiedBy(userId);
-            return userService.deleteUser(userSettingDTO);
+            return userService.topInfo();
         } catch (Exception e) {
-            logger.error("用户删除错误", e);
-            throw new ScServerException("用户删除错误");
+            logger.error("查询顶部栏信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
         }
     }
 
 
 
 
-
     /**
-     * 功能：修改密码
-     * 描述：略
-     * 作成者：邓嘉豪
-     * 作成时间：2020/4/11
+     * 新增用户接口
+     * @param user 用户信息
+     * @param imageId 上传的头像图片编号
+     * @作者 邓嘉豪
+     * @时间 2020-03-27
+     * @return
      */
-    @PostMapping("updatePwd")
-    public AppResponse updatePwd(UserInfo userInfo) {
+    @PostMapping("/addUser")
+    public AppResponse addUser(User user, String imageId) {
         try {
-            //获取用户id
-            String userId = SecurityUtils.getCurrentUserId();
-            userInfo.setupdatePerson(userId);
-            return userService.updatePwd(userInfo);
+            return userService.addUser(user, imageId);
         } catch (Exception e) {
-            logger.error("修改异常", e);
-            throw new ScServerException("修改密码失败，请重试");
+            logger.error("新增用户异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
         }
     }
 
     /**
-     * 功能：修改用户 TODO
-     * 描述：略
-     * 作成者：邓嘉豪
-     * 作成时间：2020/4/11
+     * 根据用户账号查询用户接口
+     * @作者 邓嘉豪
+     * @时间 2020-03-27
+     * @param userLoginName 用户账号
+     * @return
      */
-    @PostMapping("updateUser")
-    public AppResponse updateUser(@Valid UserInfo userInfo) {
+    /*
+    @PostMapping("/getUser")
+    public AppResponse countUserByUserLoginName(String userLoginName) {
         try {
-            //获取用户id
-            String userId = SecurityUtils.getCurrentUserId();
-            userInfo.setcreatePerson(userId);
-            userInfo.setupdatePerson(userId);
-            return userService.updateUser(userInfo);
+            return userService.countUserByUserLoginName(userLoginName);
         } catch (Exception e) {
-            logger.error("修改用户信息错误", e);
-            throw new ScServerException("系统错误，请重试");
+            logger.error("根据账号查询用户异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+     */
+
+    /**
+     * 根据用户信息条件查询用户信息（管理员、店长、司机）
+     * @作者 邓嘉豪
+     * @时间 2020-03-27
+     * @param user 查询的用户信息条件
+     * @return
+     */
+    @PostMapping("/listUsers")
+    public AppResponse listUsers(User user) {
+        try {
+            return userService.listUsers(user);
+        } catch (Exception e) {
+            logger.error("查询用户信息列表异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 修改用户信息接口
+     * @param user 要修改的用户信息
+     * @作者 邓嘉豪
+     * @时间 2020-03-27
+     * @return
+     */
+    @PostMapping("/updateUser")
+    public AppResponse updateUserById(User user, String imageId) {
+        try {
+            return userService.updateUserById(user, imageId);
+        } catch (Exception e) {
+            logger.error("修改用户信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 删除用户接口
+     * @param userId 要删除的id（批量删除用逗号分开）
+     * @作者 邓嘉豪
+     * @时间 2020-03-27
+     * @return
+     */
+    @PostMapping("/deleteUser")
+    public AppResponse deleteUserById(String userId) {
+        try {
+            return userService.deleteUserById(userId);
+        } catch (Exception e) {
+            logger.error("删除用户信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
         }
     }
 
 
     /**
      * 根据用户代码获取用户信息
-     *作者：邓嘉豪
-     * @param userCode 用户代码
+     * @作者 邓嘉豪
+     * @时间 2020-03-27
+     * @param userId 用户代码
      * @return 用户信息
      */
-    @RequestMapping(value = "getUserByUserCode")
-    public AppResponse getUserByUserCode(@NotNull(message = "用户代码不能为空") String userCode) {
+    @RequestMapping(value = "getUser")
+    public AppResponse getUserByUserCode(String userId) {
 
-        UserInfo userInfo = null;
+        User userInfo = null;
         try {
-            userInfo = userService.getUserById(userCode);
+            userInfo = userService.getUserById(userId);
         } catch (Exception e) {
             logger.error("用户查询错误", e);
             throw new ScServerException("查询错误，请重试");
@@ -162,9 +165,25 @@ public class UserController {
         return AppResponse.success("查询成功", userInfo);
     }
 
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

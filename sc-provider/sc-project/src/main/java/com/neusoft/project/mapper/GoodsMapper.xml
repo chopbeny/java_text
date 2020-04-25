@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.goods.dao.GoodsDao">
+
+    <sql id="Base_Column_List">
+      goods_id, create_time, create_person, update_time, update_person, version, is_deleted,
+      goods_code, goods_name, goods_fix_price, goods_sale_price, goods_stock,
+      goods_sale_sum,first_goods_cateCode,second_goods_cateCode,  goods_advertisement, goods_description, goods_condition,
+      goods_sale_time, goods_visit_num, goods_business, goods_isbn, goods_publisher, goods_author,
+      goods_star,goods_cate_code,image_id
+    </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+      goods_id, t_goods_info.version, goods_code, goods_name, goods_fix_price, goods_sale_price, goods_stock,
+      goods_sale_sum,first_goods_cateCode,second_goods_cateCode,  goods_advertisement, goods_description, goods_condition,
+      goods_sale_time, goods_visit_num, goods_business, goods_isbn, goods_publisher, goods_author,
+      goods_star,goods_cate_code,image_id
+    </sql>
+
+    <!-- 二级分类查询父级分类信息 -->
+    <select id="selectParentGoodsCate" parameterType="java.lang.String"
+            resultType="com.xzsd.pc.goodscate.entity.GoodsCate">
+        select
+            goods_cate_id,
+            cate_name,
+            cate_parent,
+            cate_level,
+            version
+        from
+            t_goods_cate_info
+        where
+            is_deleted = 1
+        and
+            goods_cate_id = #{cate_parent}
+    </select>
+
+    <!-- 根据商品分类编号查询商品数量 -->
+    <select id="countGoodsByGoodsCateCode" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_goods_info
+        WHERE
+            is_deleted = 1
+        and
+            goods_cate_code = #{goodsCateCode,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据isbn编号查询数据库是否已存在相同商品 -->
+    <select id="countGoodsByIsbn" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_goods_info
+        WHERE
+            is_deleted = 1
+        and
+            goods_isbn = #{goodsIsbn,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 新增商品信息 -->
+    <insert id="insertSelective" parameterType="com.xzsd.pc.goods.entity.Goods">
+        insert into t_goods_info
+                (goods_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                goods_code,
+                goods_name,
+                goods_fix_price,
+                goods_sale_price,
+                goods_stock,
+                goods_sale_sum,
+                goods_advertisement,
+                goods_description,
+                goods_condition,
+                goods_sale_time,
+                goods_visit_num,
+                goods_business,
+                goods_isbn,
+                goods_publisher,
+                goods_author,
+                goods_star,
+                first_goods_cateCode,
+                second_goods_cateCode,
+                goods_cate_code,
+                image_id)
+                values(
+                #{goodsId},
+                #{createTime},
+                #{createPerson},
+                #{updateTime},
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{goodsCode},
+                #{goodsName},
+                #{goodsFixPrice},
+                #{goodsSalePrice},
+                #{goodsStock},
+                #{goodsSaleSum},
+                #{goodsAdvertisement},
+                #{goodsDescription},
+                #{goodsCondition},
+                #{goodsSaleTime},
+                #{goodsVisitNum},
+                #{goodsBusiness},
+                #{goodsIsbn},
+                #{goodsPublisher},
+                #{goodsAuthor},
+                #{goodsStar},
+                #{firstGoodsCateCode},
+                #{secondGoodsCateCode},
+                #{goodsCateCode},
+                #{imageId}
+                )
+
+    </insert>
+
+
+    <!-- 根据查询条件查询商品信息列表（平级查询关联信息） -->
+    <select id="listAllGoods" parameterType="com.xzsd.pc.goods.entity.Goods" resultType="com.xzsd.pc.goods.entity.Goods">
+        SELECT
+            <include refid="Display_Column_List"/>
+            , t2.cate_name secondGoodsCateName
+            , (SELECT cate_name from t_goods_cate_info t1 where t1.goods_cate_id = t2.cate_parent) fistGoodsCateName
+        FROM
+            t_goods_info
+        left join t_goods_cate_info t2 on t_goods_info.goods_cate_code = t2.goods_cate_id
+
+
+        WHERE
+        t_goods_info.is_deleted = 1
+        <if test="goodsName != null and goodsName != ''">
+            and goods_name like CONCAT('%', #{goodsName}, '%')
+        </if>
+        <if test="goodsAdvertisement != null and goodsAdvertisement != ''">
+            and goods_advertisement like CONCAT('%', #{goodsAdvertisement}, '%')
+        </if>
+        <if test="goodsPublisher != null and goodsPublisher != ''">
+            and goods_publisher like CONCAT('%', #{goodsPublisher}, '%')
+        </if>
+        <if test="goodsAuthor != null and goodsAuthor != ''">
+            and goods_author like CONCAT('%', #{goodsAuthor}, '%')
+        </if>
+        <if test="goodsCondition != null">
+            and goods_condition = #{goodsCondition}
+        </if>
+        <if test="goodsCode != null and goodsCode != ''">
+            and goods_code like CONCAT('%', #{goodsCode}, '%')
+        </if>
+        order by
+            t_goods_info.create_time DESC
+    </select>
+
+    <!-- 根据商品id查询商品信息 -->
+    <select id="selectByPrimaryKey" parameterType="com.xzsd.pc.goods.entity.Goods" resultType="com.xzsd.pc.goods.entity.Goods">
+        select
+            <include refid="Display_Column_List"/>
+        FROM
+            t_goods_info
+        WHERE
+            t_goods_info.is_deleted = 1
+        and
+            goods_id = #{goodsId}
+    </select>
+
+    <!-- 根据id修改商品信息 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.xzsd.pc.goods.entity.Goods">
+        update t_goods_info
+            set
+                create_time = #{createTime},
+                create_person = #{createPerson},
+                update_time = #{updateTime},
+                update_person = #{updatePerson},
+                is_deleted = #{isDeleted},
+                goods_code = #{goodsCode},
+                goods_name = #{goodsName},
+                goods_fix_price = #{goodsFixPrice},
+                goods_sale_price = #{goodsSalePrice},
+                goods_stock = #{goodsStock},
+                goods_sale_sum = #{goodsSaleSum},
+                first_goods_cateCode = #{firstGoodsCateCode},
+                second_goods_cateCode = #{secondGoodsCateCode},
+                goods_advertisement = #{goodsAdvertisement},
+                goods_description = #{goodsDescription},
+                goods_condition = #{goodsCondition},
+                goods_sale_time = #{goodsSaleTime},
+                goods_visit_num = #{goodsVisitNum},
+                goods_business = #{goodsBusiness},
+                goods_isbn = #{goodsIsbn},
+                goods_publisher = #{goodsPublisher},
+                goods_author = #{goodsAuthor},
+                goods_star = #{goodsStar},
+                goods_cate_code = #{goodsCateCode},
+                version      = version + 1
+        where goods_id = #{goodsId}
+    </update>
+
+    <!-- 根据商品列表信息修改商品列表信息 -->
+    <update id="updateGoodsListCondition" parameterType="com.xzsd.pc.goods.entity.Goods">
+        update
+            t_goods_info
+        set
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1,
+            goods_condition = #{goodsCondition}
+            <if test="goodsCondition == 1">
+                , goods_sale_time = now()
+            </if>
+        where
+            goods_id
+        in
+            <foreach item="goodsId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{goodsId}
+            </foreach>
+    </update>
+
+    <!-- 删除商品信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteGoodsById" parameterType="java.lang.String">
+        update
+            t_goods_info
+        set
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            goods_id
+        in
+            <foreach item="goodsId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{goodsId}
+            </foreach>
+    </update>
+
+    <!-- 根据商品id列表，查询商品信息列表 -->
+    <select id="findGoodsById" resultType="com.xzsd.pc.goods.entity.Goods">
+        select
+            <include refid="Display_Column_List"/>
+        from
+            t_goods_info
+        where
+            is_deleted = 1
+        and
+            goods_id
+        in
+            <foreach item="goodsId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{goodsId}
+            </foreach>
+    </select>
+
+
+
+    <!-- 根据id查询用户信息 -->
+    <select id="getGoodsById" parameterType="java.lang.String" resultType="com.xzsd.pc.goods.entity.Goods">
+        SELECT
+        <include refid="Display_Column_List"/>
+        , t2.cate_name secondGoodsCateName
+        , (SELECT cate_name from t_goods_cate_info t1 where t1.goods_cate_id = t2.cate_parent) fistGoodsCateName
+        FROM
+        t_goods_info
+        left join t_goods_cate_info t2 on t_goods_info.goods_cate_code = t2.goods_cate_id
+        where
+        t_goods_info.is_deleted = 1
+        and
+        goods_id = #{goodsId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

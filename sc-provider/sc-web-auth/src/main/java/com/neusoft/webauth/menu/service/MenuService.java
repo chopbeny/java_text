@@ -37,6 +37,7 @@ public class MenuService {
      * @Author 邓嘉豪
      * @Date 2020-03-26
      */
+    /*
     @Transactional(rollbackFor = Exception.class)
     public AppResponse addMenu(Menu menu) {
         // 检验菜单是否存在
@@ -53,7 +54,7 @@ public class MenuService {
         }
         return AppResponse.success("新增成功！");
     }
-
+*/
     /**
      *查询菜单列表
      * @param menu

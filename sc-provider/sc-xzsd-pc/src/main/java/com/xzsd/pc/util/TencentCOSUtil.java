@@ -14,8 +14,33 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * 腾讯云对象存储COS工具类
+ *
+ * @author 黄瑞穆
+ * @date 2020-04-11
+ */
 @Component
 public class TencentCOSUtil {
+
+    //商品图片文件夹名称
+    public static final String GOODSIMAGEFOLDER = "goodsImage";
+    //轮播图文件夹名称
+    public static final String ROLLIMAGEFOLDER = "rollImage";
+    //商品评论图片文件夹名称
+    public static final String GOODSCOMMENTIMAGEFOLDER = "goodsCommentImage";
+    //头像文件夹名称
+    public static final String HEADIMAGEFOLDER = "headImage";
+
+    //商品图片分类编号
+    public static final int GOODSIMAGECATE = 1;
+    //轮播图分类编号
+    public static final int ROLLIMAGECATE = 2;
+    //商品评论图片分类编号
+    public static final int GOODSCOMMENTIMAGECATE = 3;
+    //头像分类编号
+    public static final int HEADIMAGECATE = 4;
+
 
     @Value("${spring.tengxun.accessKey}")
     private String accessKey;
@@ -30,7 +55,12 @@ public class TencentCOSUtil {
     @Value("${spring.tengxun.area}")
     private String area;
 
-
+    /**
+     * 获取腾讯的COS存储服务操作对象
+     * 用于上传文件
+     *
+     * @return 返回COSClient对象用于上传文件
+     */
     public COSClient getTencentCOSClient() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials(accessKey, secretKey);
@@ -42,8 +72,15 @@ public class TencentCOSUtil {
         return cosClient;
     }
 
-
-    public String uploadImage(MultipartFile file, String imageFolder) throws Exception {
+    /**
+     * 上传图片
+     *
+     * @param file 要上传的图片文件
+     * @param imageFolder 图片存放的文件夹
+     * @return 返回上传的图片url地址
+     * @throws IOException
+     */
+    public String uploadImage(MultipartFile file, String imageFolder) throws IOException {
         //获取COSClient对象进行上传文件
         COSClient cosClient = getTencentCOSClient();
         // 存储桶bucket的命名规则为{name}-{appid} ，此处填写的存储桶名称必须为此格式
@@ -54,7 +91,7 @@ public class TencentCOSUtil {
         // 对象键key的格式为：headImage/headImage_62058671ac4343d0baadf95f6ae9ef8c.png
         String key = imageFolder + "/" + imageFolder + "_" + UUIDUtils.getUUID() + "." + file.getContentType().substring(6);
         File localFile = null;
-        //将 MultipartFile 类型 转为 File 类型IOException
+        //将 MultipartFile 类型 转为 File 类型
         localFile = File.createTempFile("temp", null);
         file.transferTo(localFile);
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -110,10 +147,5 @@ public class TencentCOSUtil {
 
     public void setArea(String area) {
         this.area = area;
-    }
-
-
-    public MultipartFile uploadImage(MultipartFile file) {
-        return file;
     }
 }

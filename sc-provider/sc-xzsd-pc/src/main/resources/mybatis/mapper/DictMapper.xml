@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.dict.dao.DictDao">
+
+    <sql id="Base_Column_List">
+    dict_id, create_time, create_person, update_time, update_person, version, is_deleted, 
+    dict_key, dict_value, dict_comment
+  </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+      dict_id, version, dict_key, dict_value, dict_comment
+    </sql>
+
+    <!-- 根据key查找字典值 -->
+    <select id="selectDictByKey" resultType="com.xzsd.pc.dict.entity.Dict" parameterType="java.lang.String">
+        select
+            <include refid="Display_Column_List"/>
+        from
+            t_dict_info
+        where
+            dict_key = #{key}
+    </select>
+
+    <!-- 根据字典的key去更新字典的value -->
+    <update id="updateDictByKey" parameterType="com.xzsd.pc.dict.entity.Dict">
+        update
+            t_dict_info
+        set
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1,
+            dict_value = #{dict.dictValue}
+        where
+            dict_id = #{dict.dictId}
+    </update>
+
+
+</mapper>

@@ -1,64 +1,85 @@
-package com.xzsd.pc.goodsCate.dao;
-import com.xzsd.pc.goodsCate.entity.GoodsCateInfo;
+package com.xzsd.pc.goodscate.dao;
+
+
+import com.xzsd.pc.goodscate.entity.GoodsCate;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 /**
- * @ClassName GoodsCate
- * @Description goodsCate
- * @Author 邓嘉豪
- * @Date 2020-03-26
+ * 商品分类数据库接口类
+ *
+ * @author 邓嘉豪
+ * @date 2020-04-13
  */
 @Mapper
 public interface GoodsCateDao {
 
-
     /**
-     * 统计商品分类数量
-     * @param goodsCateInfo 商品分类信息
+     * 根据父级编号查询父级分类是否存在
+     *
+     * @param cateParent 父级编号
      * @return
      */
-    int countCateId(GoodsCateInfo goodsCateInfo);
+    int countGoodsCateByCateParent(@Param("cateParent") String cateParent);
 
     /**
-     * 新增分类商品
-     * @param goodsCateInfo 商品分类信息
+     * 新增商品分类信息
+     *
+     * @param goodsCate 商品分类信息
      * @return
      */
-    int addGoodsCate(GoodsCateInfo goodsCateInfo);
-
-
-    /**
-     * 获取商品分类所有信息
-     * @param goodsCateInfo 商品信息
-     * @return 所有用户信息
-     */
-    List<GoodsCateInfo> listGoodsCateByPage(GoodsCateInfo goodsCateInfo);
-
+    int insertSelective(GoodsCate goodsCate);
 
     /**
-     * 获取商品分类详情
-     * @param cateId 商品信息
-     * @return 所有用户信息
+     * 查询树形商品分类信息（一级分类包含二级分类）
+     *
+     * @return
      */
+    List<GoodsCate> listTreeGoodsCates();
 
-    GoodsCateInfo findGoodsCateById(String cateId);
+    /**
+     * 根据商品分类id查询商品分类信息
+     * @param goodsCateId 商品分类id
+     * @return
+     */
+    GoodsCate findGoodsCateById(@Param("goodsCateId") String goodsCateId);
 
     /**
      * 修改商品分类信息
-     * @param goodsCateInfo 商品信息
-     * @return 修改结果
-     */
-    int updateGoodsCateById(GoodsCateInfo goodsCateInfo);
-
-    /**
-     * 删除商品分类信息
-     * @param listCode 选中的用户编号集合
-     * @param cateid 更新人
+     * @param goodsCate 商品分类信息
      * @return
      */
+    int updateByPrimaryKeySelective(GoodsCate goodsCate);
 
-    int deleteGoodsCateById(List<String> listCode, @Param("cateid") String cateid);
+    /**
+     * 根据父级商品分类编号查询该分类下子分类的数量
+     * @param goodsCateId 父级商品分类编号
+     * @return
+     */
+    int countSonGoodsCateById(String goodsCateId);
+
+    /**
+     * 删除商品分类信息（修改字段is_delete状态，并非真正删除）
+     * @param goodsCateId 要删除的商品分类编号
+     * @param updatePersonId 更新人id
+     * @return
+     */
+    int deleteGoodsCateById(@Param("goodsCateId") String goodsCateId, @Param("updatePersonId") String updatePersonId);
+
+    /**
+     * 根据父级编号查询子商品分类信息列表，传入null表示查询第一级商品分类信息
+     *
+     * @return
+     */
+    List<GoodsCate> listGoodsCatesByParentCode(@Param("cateParent") String cateParent);
+
+    int deleteByPrimaryKey(String goodsCateId);
+
+    int insert(GoodsCate record);
+
+    GoodsCate selectByPrimaryKey(String goodsCateId);
+
+    int updateByPrimaryKey(GoodsCate record);
 }

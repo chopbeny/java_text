@@ -24,7 +24,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/xzsd?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
-    password: root
+    password: 123456
     druid:
       initialSize: 1
       minIdle: 1
@@ -54,6 +54,13 @@ spring:
           statement-executable-sql-log-enable: false
           connection-log-enabled: false
           result-set-log-enabled: false
+  tengxun:
+    accessKey: AKIDm11mIYUxc2b1DANXyB82hMm60e7J9PDm
+    secretKey: WljBNIUQ5TmFTeeWA5sRREAsecNhnvp8
+    bucket: xzsd-1256429603
+    bucketName: xzsd-1256429603
+    path: https://xzsd-1256429603.cos.ap-hongkong.myqcloud.com
+    area: ap-hongkong
 mybatis:
   mapper-locations: classpath:mybatis/mapper/**/*Mapper.xml
   config-location: classpath:mybatis/mybatis-config.xml

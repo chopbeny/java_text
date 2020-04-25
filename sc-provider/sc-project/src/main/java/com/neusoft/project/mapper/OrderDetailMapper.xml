@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xzsd.dao.OrderDetailMapper">
+  <sql id="Base_Column_List">
+    order_detail_id, create_time, create_person, update_time, update_person, version, 
+    is_deleted, order_detail_order_code, order_detail_goods_code, order_detail_goods_num, 
+    order_detail_goods_total_price, order_detail_goods_sale_price, order_detail_goods_fix_price, 
+    order_detail_goods_name, order_detail_goods_display_code
+  </sql>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultType="com.xzsd.pc.order.entity.Order">
+    select 
+    <include refid="Base_Column_List" />
+    from t_order_detail
+    where order_detail_id = #{orderDetailId}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_order_detail
+    where order_detail_id = #{orderDetailId}
+  </delete>
+
+  <insert id="insert" parameterType="com.xzsd.pc.orderdetail.entity.OrderDetail">
+    insert into t_order_detail (order_detail_id, create_time, create_person, 
+      update_time, update_person, version, 
+      is_deleted, order_detail_order_code, order_detail_goods_code, 
+      order_detail_goods_num, order_detail_goods_total_price, 
+      order_detail_goods_sale_price, order_detail_goods_fix_price, 
+      order_detail_goods_name, order_detail_goods_display_code
+      )
+    values (#{orderDetailId}, #{createTime}, #{createPerson},
+      #{updateTime}, #{updatePerson}, #{version},
+      #{isDeleted}, #{orderDetailOrderCode}, #{orderDetailGoodsCode},
+      #{orderDetailGoodsNum}, #{orderDetailGoodsTotalPrice},
+      #{orderDetailGoodsSalePrice}, #{orderDetailGoodsFixPrice},
+      #{orderDetailGoodsName}, #{orderDetailGoodsDisplayCode}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.xzsd.pc.orderdetail.entity.OrderDetail">
+    insert into t_order_detail
+    (
+        order_detail_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        order_detail_order_code,
+        order_detail_goods_code,
+        order_detail_goods_num,
+        order_detail_goods_total_price,
+        order_detail_goods_sale_price,
+        order_detail_goods_fix_price,
+        order_detail_goods_name,
+        order_detail_goods_display_code)
+   value (
+        #{orderDetailId},
+        #{createTime},
+        #{createPerson},
+        #{updateTime},
+        #{updatePerson},
+        #{version},
+        #{isDeleted},
+        #{orderDetailOrderCode},
+        #{orderDetailGoodsCode},
+        #{orderDetailGoodsNum},
+        #{orderDetailGoodsTotalPrice},
+        #{orderDetailGoodsSalePrice},
+        #{orderDetailGoodsFixPrice},
+        #{orderDetailGoodsName},
+        #{orderDetailGoodsDisplayCode})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xzsd.pc.orderdetail.entity.OrderDetail">
+    update t_order_detail
+        set
+        create_time = #{createTime},
+        create_person = #{createPerson},
+        update_time = #{updateTime},
+        update_person = #{updatePerson},
+        is_deleted = #{isDeleted},
+        order_detail_order_code = #{orderDetailOrderCode},
+        order_detail_goods_code = #{orderDetailGoodsCode},
+        order_detail_goods_num = #{orderDetailGoodsNum},
+        order_detail_goods_total_price = #{orderDetailGoodsTotalPrice},
+        order_detail_goods_sale_price = #{orderDetailGoodsSalePrice},
+        order_detail_goods_fix_price = #{orderDetailGoodsFixPrice},
+        order_detail_goods_name = #{orderDetailGoodsName},
+        order_detail_goods_display_code = #{orderDetailGoodsDisplayCode},
+        version      = version + 1
+    where order_detail_id = #{orderDetailId}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xzsd.pc.orderdetail.entity.OrderDetail">
+    update t_order_detail
+    set create_time = #{createTime},
+      create_person = #{createPerson},
+      update_time = #{updateTime},
+      update_person = #{updatePerson},
+      version = #{version},
+      is_deleted = #{isDeleted},
+      order_detail_order_code = #{orderDetailOrderCode},
+      order_detail_goods_code = #{orderDetailGoodsCode},
+      order_detail_goods_num = #{orderDetailGoodsNum},
+      order_detail_goods_total_price = #{orderDetailGoodsTotalPrice},
+      order_detail_goods_sale_price = #{orderDetailGoodsSalePrice},
+      order_detail_goods_fix_price = #{orderDetailGoodsFixPrice},
+      order_detail_goods_name = #{orderDetailGoodsName},
+      order_detail_goods_display_code = #{orderDetailGoodsDisplayCode}
+    where order_detail_id = #{orderDetailId}
+  </update>
+</mapper>

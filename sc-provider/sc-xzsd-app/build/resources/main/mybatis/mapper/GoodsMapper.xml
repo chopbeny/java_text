@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.app.goods.dao.GoodsDao">
+
+    <sql id="Base_Column_List">
+      goods_id, create_time, create_person, update_time, update_person, version, is_deleted,
+      goods_code, goods_name, goods_fix_price, goods_sale_price, goods_stock,
+      goods_sale_sum,first_goods_cateCode,second_goods_cateCode,  goods_advertisement, goods_description, goods_condition,
+      goods_sale_time, goods_visit_num, goods_business, goods_isbn, goods_publisher, goods_author,
+      goods_star,goods_cate_code,image_id
+    </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+      goods_name, goods_sale_price,
+      goods_description, goods_isbn, goods_publisher, goods_author,goods_star
+    </sql>
+
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List1">
+      goods_id, t_goods_info.version, goods_code, goods_name, goods_fix_price, goods_sale_price, goods_stock,
+      goods_sale_sum,first_goods_cateCode,second_goods_cateCode,  goods_advertisement, goods_description, goods_condition,
+      goods_sale_time, goods_visit_num, goods_business, goods_isbn, goods_publisher, goods_author,
+      goods_star,goods_cate_code,image_id
+    </sql>
+
+    <resultMap id="GoodsCateGoodsInfoResultMap" type="com.xzsd.app.goods.entity.GoodsCate">
+        <id column="second_goods_cateCode" property="secondGoodsCateCode" jdbcType="VARCHAR"/>
+        <result column="second_goods_cateName" property="secondGoodsCateName" jdbcType="VARCHAR"/>
+        <!-- 关联商品信息 -->
+        <collection property="goodsInfoList" ofType="com.xzsd.app.goods.entity.GoodsInfo">
+            <id column="goods_id" property="goodsId" jdbcType="VARCHAR"/>
+            <result column="goods_sale_price" property="goodsSalePrice" jdbcType="VARCHAR"/>
+            <result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+            <result column="image_url" property="goodsImagePath" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <!-- 根据商品id查询商品信息 -->
+    <select id="selectByPrimaryKey" parameterType="com.xzsd.app.goods.entity.GoodsInfo" resultType="com.xzsd.app.goods.entity.GoodsInfo">
+        select
+        <include refid="Display_Column_List"/>,
+        t_image_info.image_url goodsImagePath,
+        t_store_info.store_name storeName
+        FROM
+        t_goods_info
+        left join t_image_info on t_goods_info.goods_id = t_image_info.image_cate_code
+        ,
+        t_sys_user_info
+        left join t_store_info on t_sys_user_info.user_store_id = t_store_info.store_code
+
+        WHERE
+        t_goods_info.is_deleted = 1
+        and
+        t_sys_user_info.user_store_id = #{invite}
+        and
+        t_goods_info.goods_id = #{goodsId}
+    </select>
+
+
+    <!-- 根据查询条件查询商品信息列表 -->
+    <select id="listAllGoods" parameterType="com.xzsd.app.goods.entity.GoodsInfo" resultType="com.xzsd.app.goods.entity.GoodsInfo">
+        SELECT
+        user_login_name userAcct,
+        goods_comment evaluateContent,
+        goods_comment_star evaluateScore,
+        goods_comment_time createTime
+        FROM
+        t_goods_comment
+        left join t_sys_user_info on t_goods_comment.goods_comment_client_code = t_sys_user_info.user_code
+        left join t_goods_info on t_goods_info.goods_code = t_goods_comment.goods_comment_goods_code
+        WHERE
+        t_sys_user_info.is_deleted = 1
+        <if test="goodsId != null and goodsId != ''">
+            and goods_id like CONCAT('%', #{goodsId}, '%')
+        </if>
+        <if test="evaluateScore != null and evaluateScore != ''">
+            and goods_comment_star like CONCAT('%', #{evaluateScore}, '%')
+        </if>
+    </select>
+
+
+
+    <!-- 根据查询条件查询商品信息列表 -->
+    <select id="listOneGoodsClassify" parameterType="com.xzsd.app.goods.entity.GoodsInfo" resultType="com.xzsd.app.goods.entity.GoodsInfo">
+        SELECT
+        goods_cate_id classifyId,
+        cate_name classifyName
+        FROM
+        t_goods_cate_info
+        WHERE
+        is_deleted = 1
+        and
+        cate_level = 1
+    </select>
+
+
+
+    <!-- 根据查询条件查询商品信息列表 -->
+    <select id="listGetClassGoods" resultMap="GoodsCateGoodsInfoResultMap">
+        SELECT
+	        t2.cate_name second_goods_cateName,
+	        t2.goods_cate_id second_goods_cateCode,
+	        goods_id goodsId,
+	        goods_sale_price,
+	        goods_name,
+	        image_url
+        from
+            t_goods_cate_info t1
+            LEFT JOIN t_goods_cate_info t2 on t1.goods_cate_id = t2.cate_parent
+            LEFT JOIN t_goods_info on t_goods_info.goods_cate_code = t2.goods_cate_id
+            LEFT JOIN t_image_info on t_goods_info.goods_id = t_image_info.image_cate_code
+        WHERE
+            t1.goods_cate_id = #{classifyId}
+    </select>
+
+
+    <!-- 根据商品id查询商品信息 -->
+    <select id="getGoodsById" parameterType="com.xzsd.app.goods.entity.GoodsInfo" resultType="com.xzsd.app.goods.entity.GoodsInfo">
+        select
+        <include refid="Display_Column_List1"/>
+        FROM
+        t_goods_info
+        WHERE
+        t_goods_info.is_deleted = 1
+        and
+        goods_id = #{goodsId}
+    </select>
+
+
+    <!-- 根据isbn编号查询数据库是否已存在相同商品 -->
+    <select id="countGoodsByIsbn" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_goods_info
+        WHERE
+            is_deleted = 1
+        and
+            goods_isbn = #{goodsIsbn}
+    </select>
+
+
+
+    <!-- 查询多个商品信息 -->
+    <select id="findGoodsByList" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_goods_info
+        where
+        is_deleted = 1
+        and
+            goods_id
+        in
+        <foreach item="goodsId" index="index" collection="listGoodsIds" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </select>
+
+
+
+</mapper>

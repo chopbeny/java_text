@@ -1,99 +1,167 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xzsd.pc.rollImage.dao.RollImageDao">
+<mapper namespace="com.xzsd.pc.rollimage.dao.RollImageDao">
+    <sql id="Base_Column_List">
+      roll_image_id, create_time, create_person, update_time, update_person, version, is_deleted,
+      roll_image_code, roll_image_weight, roll_image_goods_code, roll_image_begin_date,
+      roll_image_end_date, roll_image_condition
+    </sql>
+    <!-- 用户信息前台展示字段 -->
+    <sql id="Display_Column_List">
+      roll_image_id, t_roll_image.version, roll_image_code, roll_image_weight, roll_image_goods_code, roll_image_begin_date,
+      roll_image_end_date, roll_image_condition
+    </sql>
 
-    <!--统计轮播图数量-->
-    <select id="countRollImage" parameterType ="com.xzsd.pc.rollImage.entity.RollImageInfo" resultType ="int">
-        select count(roll_image_id)
-        from t_roll_image
-        where is_deleted = 0
-        and roll_image_code = #{rollImageCode}
+
+    <!-- 根据所选商品编号查询是否已经存在该商品的轮播图 -->
+    <select id="countRollImageByRollImageGoodsCode" parameterType="java.lang.String" resultType="int">
+        select
+            count(*)
+        from
+            t_roll_image
+        where
+            is_deleted = 1
+        and
+            roll_image_goods_code = #{rollImageGoodsCode}
     </select>
 
-    <!--新增轮播图-->
-    <insert id ="addRollImage" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo">
-        insert into t_roll_image
-        (
-        roll_image_id,
-        create_time,
-        create_person,
-        update_time,
-        update_person,
-        version,
-        is_deleted,
-        roll_image_code,
-        roll_image_weight,
-        roll_image_goods_code,
-        roll_image_begin_date,
-        roll_image_end_date,
-        roll_image_condition,
-        roll_image_imageFileUrl)
+    <!-- 根据商品的排序查询是否已经存在该排序的轮播图 -->
+    <select id="countRollImageByWeight" parameterType="int" resultType="int">
+        select
+            count(*)
+        from
+            t_roll_image
+        where
+            is_deleted = 1
+        and
+            roll_image_weight = #{rollImageWeight}
+    </select>
 
-        values
-        (#{rollImageId},
-        #{createTime},
-        #{createPerson},
-        #{updateTime},
-        #{updatePerson},
-        #{version},
-        #{isDeleted},
-        #{rollImageCode},
-        #{rollImageWeight},
-        #{rollImageGoodsCode},
-        #{rollImageBeginDate},
-        #{rollImageEndDate},
-        #{rollImageCondition},
-        #{imageFileUrl})
+    <!-- 新增轮播图 -->
+    <insert id="insertSelective" parameterType="com.xzsd.pc.rollimage.entity.RollImage">
+        insert into t_roll_image
+                (
+                roll_image_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                roll_image_code,
+                roll_image_weight,
+                roll_image_goods_code,
+                roll_image_begin_date,
+                roll_image_end_date,
+                roll_image_condition)
+        value (
+                #{rollImageId},
+                now(),
+                #{createPerson},
+                now(),
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{rollImageCode},
+                #{rollImageWeight},
+                #{rollImageGoodsCode},
+                #{rollImageBeginDate},
+                #{rollImageEndDate},
+                #{rollImageCondition})
     </insert>
 
-    <!--轮播图列表-->
-    <select id="listRollImages" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo" resultType="com.xzsd.pc.rollImage.entity.RollImageInfo">
-        select
-        a.roll_image_id rollImageId,
-        a.roll_image_code rollImageCode,
-        a.roll_image_weight rollImageWeight,
-        a.roll_image_goods_code rollImageGoodsCode,
-        a.roll_image_begin_date rollImageBeginDate,
-        a.roll_image_end_date rollImageEndDate,
-        a.roll_image_condition rollImageCondition,
-        a.roll_image_imageFileUrl rollImageImageFilUrl
-
-        from t_roll_image a
-        where a.is_deleted = 0
-        <if test="rollImageId != null and rollImageId != ''">
-            and a.roll_image_id like concat('%', #{rollImageId}, '%')
-        </if>
-        order by create_time desc
+    <!-- 根据轮播图状态查询轮播图列表 -->
+    <select id="listRollImages" parameterType="com.xzsd.pc.rollimage.entity.RollImage" resultType="com.xzsd.pc.rollimage.entity.RollImage">
+        SELECT
+            <include refid="Display_Column_List"/>
+            , t_image_info.image_id imageId
+            , t_image_info.image_url imageUrl
+        FROM
+            t_roll_image
+        left join t_image_info on t_image_info.image_cate_code = t_roll_image.roll_image_id
+        WHERE
+            t_roll_image.is_deleted = 1
+            <if test="rollImageCondition != 2 and rollImageCondition != null">
+                and roll_image_condition = #{rollImageCondition}
+            </if>
     </select>
 
+    <!-- 根据轮播图编号列表查询轮播图列表信息 -->
+    <select id="listRollImagesByIds" resultType="com.xzsd.pc.rollimage.entity.RollImage">
+        select
+            <include refid="Display_Column_List"/>
+        from
+            t_roll_image
+        where
+            roll_image_id
+        in
+            <foreach item="rollImageId" index="index" collection="rollImageIds" open="(" separator="," close=")">
+                #{rollImageId}
+            </foreach>
+    </select>
 
-
-    <!--修改轮播图状态-->
-    <update id="updateRollImageConditionById" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo">
-        update t_roll_image
+    <!-- 批量修改轮播图状态信息 -->
+    <update id="updateRollImageListCondition" parameterType="java.lang.String">
+        update
+            t_roll_image
         set
-        roll_image_id = #{rollImageCondition},
-        version = version + 1
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1,
+            roll_image_condition = #{rollImageCondition}
+        where
+            roll_image_id
+        in
+            <foreach item="rollImage" index="index" collection="rollImageList" open="(" separator="," close=")">
+                #{rollImage.rollImageId}
+            </foreach>
+    </update>
 
-        where roll_image_id = #{rollImageId}
-        and version = #{version}
+    <!-- 删除用户信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteRollImageById" parameterType="java.lang.String">
+        update
+            t_roll_image
+        set
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            roll_image_id
+        in
+            <foreach item="rollImageId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{rollImageId}
+            </foreach>
     </update>
 
 
-    <!--删除轮播图-->
-    <update id="deleteRollImageById" parameterType="com.xzsd.pc.rollImage.entity.RollImageInfo">
-        update t_roll_image
-        set
-        is_deleted = 1,
-        update_time = now(),
-        update_person   = #{roll_image_id},
-        version = version + 1
-        where roll_image_id in
-        <foreach item="item" index="index" collection="listCode" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </update>
 
 
+    <!-- 根据查询条件查询商品信息列表 -->
+    <select id="listAllGoods" parameterType="com.xzsd.pc.goods.entity.Goods" resultType="com.xzsd.pc.goods.entity.Goods">
+        SELECT
+        goods_id goodsId,
+        goods_name goodsName,
+        goods_condition goodsCondition
+        , t2.cate_name secondGoodsCateName
+        , (SELECT cate_name from t_goods_cate_info t1 where t1.goods_cate_id = t2.cate_parent) firstGoodsCateName
+        FROM
+        t_goods_info
+        left join t_goods_cate_info t2 on t_goods_info.goods_cate_code = t2.goods_cate_id
+
+
+        WHERE
+        t_goods_info.is_deleted = 1
+        and
+        t_goods_info.goods_condition = 1
+        <if test="goodsName != null and goodsName != ''">
+            and goods_name like CONCAT('%', #{goodsName}, '%')
+        </if>
+        <if test="goodsId != null and goodsId != ''">
+            and goods_id like CONCAT('%', #{goodsId}, '%')
+        </if>
+        order by
+        t_goods_info.create_time DESC
+    </select>
 
 </mapper>

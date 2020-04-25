@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.area.dao.AreaDao">
+
+    <sql id="Base_Column_List">
+    area_name_id, create_time, create_person, update_time, update_person, version, is_deleted,
+    area_name, area_name_level, area_name_parent_code
+  </sql>
+    <!-- 前台展示字段 -->
+    <sql id="display_Column_List">
+     area_name_id, area_name, area_name_level, area_name_parent_code
+    </sql>
+
+
+    <!-- 查询子级区域名称信息，例如省查市级，市查区级 -->
+    <select id="selectChildAreaList" parameterType="java.lang.String" resultType="com.xzsd.pc.area.entity.Area">
+        select
+            area_name_id,
+            area_name,
+            area_name_level,
+            area_name_parent_code
+        from
+            t_area_name
+        where
+            is_deleted = 1
+        and
+            area_name_parent_code = #{area_name_id,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 查询所有区域名称列表 -->
+    <select id="listAreas" resultType="com.xzsd.pc.area.entity.Area">
+        select
+        <include refid="display_Column_List"/>
+        from
+        t_area_name
+        where
+        is_deleted = 1
+    </select>
+
+    <!-- 根据父级编号查询子区域名称列表，传入null表示查询第一级区域名称 -->
+    <select id="listAreasByParentCode" parameterType="java.lang.String" resultType="com.xzsd.pc.area.entity.Area">
+        select
+        <include refid="display_Column_List"/>
+        from
+        t_area_name
+        where
+        is_deleted = 1
+        and
+        <choose>
+            <when test="areaNameParentCode != null">
+                area_name_parent_code = ${areaNameParentCode}
+            </when>
+            <otherwise>
+                area_name_parent_code is NULL
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询树形区域名称（省包含所有市，市包含所有区（县）） -->
+    <select id="listTreeAreas" resultType="com.xzsd.pc.area.entity.Area">
+        SELECT
+            area_name_id,
+            area_name,
+            area_name_level,
+            area_name_parent_code
+        from
+            t_area_name
+        where
+            is_deleted = 1
+        and
+            area_name_level = 1
+    </select>
+
+
+</mapper>

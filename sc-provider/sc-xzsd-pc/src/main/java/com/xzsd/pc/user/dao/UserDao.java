@@ -1,68 +1,95 @@
 package com.xzsd.pc.user.dao;
 
 
-import com.xzsd.pc.user.entity.UserInfo;
-import com.xzsd.pc.user.entity.UserSettingDTO;
+import com.xzsd.pc.user.entity.User;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 /**
- * @ClassName UserDao
- * @Description 用户管理
- * @Author 邓嘉豪
- * @Date 2020/4/11
+ * 用户管理数据库接口类
+ * @author 邓嘉豪
+ * @date 2020-04-10
  */
+@Mapper
 public interface UserDao {
+
     /**
-     * 新增用户
-     * @param userInfo 用户信息
+     * 新增用户信息
+     * @author 邓嘉豪
+     * @date 2020-04-10
+     * @param user 用户信息
      * @return
      */
-    int saveUser(UserInfo userInfo);
+    int insertSelective(User user);
 
     /**
-     * 获取用户信息
-     * @param userCode 用户代码
-     * @return 用户信息
-     */
-    UserInfo getUserById(@Param("userCode") String userCode);
-
-    /**
-     * 获取所有用户信息
-     * @param userInfo 用户信息
-     * @return 所有用户信息
-     */
-    List<UserInfo> listUsersByPage(UserInfo userInfo);
-
-    /**
-     * 修改用户信息
-     * @param userInfo 用户信息
-     * @return 修改结果
-     */
-    int updateUser(UserInfo userInfo);
-
-
-/**
-     * 删除用户信息
-     * @param userSettingDTO 选中的用户信息
-     * @return
-*/
-    int deleteUser(UserSettingDTO userSettingDTO);
-
-
-
-
-    /**
-     * 修改密码
-     * @param userInfo 用户信息
+     * 根据用户账号信息计算用户数
+     * @author 邓嘉豪
+     * @date 2020-04-10
+     * @param userLoginName 用户账号
      * @return
      */
-    int updateUserPwd(UserInfo userInfo);
+    int countUserByUserLoginName(@Param("userLoginName") String userLoginName);
+
     /**
-     * 统计用户账号数量
-     * @param userInfo 用户信息
+     * 根据用户账号计算用户数（排除用户本身）
+     * @param user 用户账号和用户编号
+     * @author 邓嘉豪
+     * @date 2020-04-10
      * @return
      */
-    int countUserAcct(UserInfo userInfo);
+    int countUserByUserLoginNameAndUserId(User user);
+
+    /**
+     * 根据用户信息条件查询用户信息（管理员、店长、司机）
+     * @author 邓嘉豪
+     * @date 2020-04-10
+     * @param user 查询的用户信息条件
+     * @return
+     */
+    List<User> listUsers(User user);
+
+    /**
+     * 根据id查询用户信息
+     * @author 邓嘉豪
+     * @date 2020-04-10
+     * @param userId 用户id
+     * @return
+     */
+    User selectByPrimaryKey(@Param("userId") String userId);
+
+    /**
+     * 根据id修改用户信息
+     *
+     * @param user 门店信息
+     * @return
+     */
+    int updateByPrimaryKeySelective(User user);
+
+    /**
+     * 删除用户信息（修改字段is_delete状态，并非真正删除）
+     * @author 邓嘉豪
+     * @date 2020-04-10
+     * @param listIds        要删除的用户信息列表
+     * @param updatePersonId 更新人id
+     * @return
+     */
+    int deleteUserById(@Param("listIds") List<String> listIds, @Param("updatePersonId") String updatePersonId);
+
+    /**
+     * 根据id查询用户信息
+     * @param userId 用户id
+     * @author 邓嘉豪
+     * @date 2020-04-10
+     * @return
+     */
+    User findUserById(@Param("userId") String userId);
+
+    int deleteByPrimaryKey(String userId);
+
+    int insert(User record);
+
+    int updateByPrimaryKey(User record);
 }

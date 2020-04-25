@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.app.user.dao.UserDao">
+
+    <!-- 新增用户信息 -->
+    <insert id="insertSelective" parameterType="com.xzsd.app.user.entity.User">
+        insert into t_sys_user_info
+                (user_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                user_code,
+                user_login_name,
+                user_password,
+                user_role,
+                user_name,
+                user_sex,
+                user_phone,
+                user_mail,
+                user_idcard,
+                user_store_id,
+                user_image_url)
+          value
+              (
+                #{userId},
+                now(),
+                #{createPerson},
+                now(),
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{userCode},
+                #{userAcct},
+                #{userPassword},
+                #{role},
+                #{userName},
+                #{sex},
+                #{phone},
+                #{mail},
+                #{idCard},
+                #{inviteCode},
+                #{imagePath})
+    </insert>
+
+    <!-- 根据用户账号信息计算用户数 -->
+    <select id="countUserByUserLoginName" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_sys_user_info
+        WHERE
+            is_deleted = 1
+        and
+            user_login_name = #{userLoginName}
+    </select>
+
+
+
+    <!-- 根据id查询用户信息 -->
+    <select id="selectByPrimaryKey" resultType="com.xzsd.app.user.entity.User" parameterType="java.lang.String">
+        select
+            user_id userId,
+            t_sys_user_info.create_time createTime,
+            t_sys_user_info.create_person createPerson,
+            t_sys_user_info.update_time updateTime,
+            t_sys_user_info.update_person updatePerson,
+            t_sys_user_info.version version,
+            t_sys_user_info.is_deleted isDeleted,
+            user_code userCode,
+            user_login_name userAcct,
+            user_password userPassword,
+            user_role role,
+            user_name userName,
+            user_sex sex,
+            user_phone phone,
+            user_mail mail,
+            user_idcard idCard,
+            user_store_id inviteCode,
+            user_image_url imagePath
+        from
+            t_sys_user_info
+        where
+            t_sys_user_info.is_deleted = 1
+        and
+            user_id = #{userId}
+    </select>
+
+</mapper>

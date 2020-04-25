@@ -8,26 +8,64 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * @ClassName menu
- * @Description nmenu
- * @Author 邓嘉豪
- * @Date 2020-03-26
+ * 菜单管理数据库接口类
+ *
+ * @author 邓嘉豪
+ * @date 2020-04-10
  */
 @Mapper
 public interface MenuDao {
-    /**
-     * 统计菜单数量
-     * @param menu 菜单信息
-     * @return
-     */
-    int countMenu(Menu menu);
 
     /**
-     * 新增菜单
+     * 新增菜单信息
      * @param menu 菜单信息
      * @return
      */
-    int addMenu(Menu menu);
+    int insertSelective(Menu menu);
+
+    /**
+     * 根据菜单名称计算菜单数
+     * @param menuName 菜单名称
+     * @return
+     */
+    int countMenuByMenuName(@Param("menuName") String menuName);
+
+    /**
+     * 查询菜单列表接口
+     * @return
+     */
+    List<Menu> listMenus();
+
+    /**
+     * 根据菜单id查找菜单信息
+     * @param menuId 菜单id
+     * @return
+     */
+    Menu selectByPrimaryKey(@Param("menuId") String menuId);
+
+    /**
+     * 修改菜单信息
+     * @param menu 菜单信息
+     * @return
+     */
+    int updateByPrimaryKeySelective(Menu menu);
+
+    /**
+     * 删除菜单信息（修改字段is_delete状态，并非真正删除）
+     * @param listIds 要删除的菜单信息列表
+     * @param updatePersonId 更新人id
+     * @return
+     */
+    int deleteMenuById(@Param("listIds") List<String> listIds, @Param("updatePersonId") String updatePersonId);
+
+
+    int deleteByPrimaryKey(String menuId);
+
+    int insert(Menu record);
+
+    int updateByPrimaryKey(Menu record);
+
+
 
     /**
      * 获取所有菜单信息
@@ -35,26 +73,4 @@ public interface MenuDao {
      * @return 所有菜单信息
      */
     List<Menu> listMenuByPage(Menu menu);
-
-    /**
-     * 删除菜单
-     * @param listCode 选中的用户编号集合
-     * @param menuid 更新人
-     * @return
-     */
-    int deleteMenu(List<String> listCode, @Param("menuid") String menuid);
-
-    /**
-     * 修改菜单信息
-     * @param menu 用户信息
-     * @return 修改结果
-     */
-    int updateMenu(Menu menu);
-
-    /**
-     * 查询菜单信息
-     * @param menuId 用户编号
-     * @return 修改结果
-     */
-    Menu getMenu(@Param("menuId") String menuId);
 }

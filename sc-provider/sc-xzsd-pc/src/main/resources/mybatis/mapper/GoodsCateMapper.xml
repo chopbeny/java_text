@@ -1,127 +1,184 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xzsd.pc.goodsCate.dao.GoodsCateDao">
+<mapper namespace="com.xzsd.pc.goodscate.dao.GoodsCateDao">
+    <resultMap id="BaseResultMap" type="com.xzsd.pc.goodscate.entity.GoodsCate">
+        <id column="goods_cate_id" property="goodsCateId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_person" property="createPerson" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_person" property="updatePerson" jdbcType="VARCHAR"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+        <result column="cate_name" property="cateName" jdbcType="VARCHAR"/>
+        <result column="cate_level" property="cateLevel" jdbcType="INTEGER"/>
+        <result column="cate_parent" property="cateParent" jdbcType="VARCHAR"/>
+        <result column="cate_comment" property="cateComment" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        goods_cate_id, create_time, create_person, update_time, update_person, version, is_deleted,
+        cate_name, cate_level, cate_parent, cate_comment
+    </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+        goods_cate_id, version, cate_name, cate_level, cate_parent, cate_comment
+    </sql>
+    <!-- 商品分类关联查询子商品分类ResultMap -->
+    <resultMap id="GoodsCateSonResultMap" type="com.xzsd.pc.goodscate.entity.GoodsCate" extends="BaseResultMap">
+        <!-- 关联查询子商品分类 -->
+        <collection property="childGoodsCateList" ofType="com.xzsd.pc.goodscate.entity.GoodsCate"
+                    column="goods_cate_id" select="selectChildGoodsCateList">
+            <id column="goods_cate_id" property="goodsCateId" jdbcType="VARCHAR"/>
+            <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="create_person" property="createPerson" jdbcType="VARCHAR"/>
+            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+            <result column="update_person" property="updatePerson" jdbcType="VARCHAR"/>
+            <result column="version" property="version" jdbcType="INTEGER"/>
+            <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+            <result column="cate_name" property="cateName" jdbcType="VARCHAR"/>
+            <result column="cate_level" property="cateLevel" jdbcType="INTEGER"/>
+            <result column="cate_parent" property="cateParent" jdbcType="VARCHAR"/>
+            <result column="cate_comment" property="cateComment" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
 
-    <!--统计商品分类数量-->
-    <select id="countCateId" parameterType ="com.xzsd.pc.goodsCate.entity.GoodsCateInfo" resultType ="int">
-        select count(cate_name)
-        from t_goods_cate_info
-        where is_deleted = 0
-        and cate_name = #{cateName}
+
+    <!-- 查询子商品分类信息，例如教育分类查询儿童教育 -->
+    <select id="selectChildGoodsCateList" parameterType="java.lang.String" resultType="com.xzsd.pc.goodscate.entity.GoodsCate">
+        select
+        <include refid="Display_Column_List"/>
+        from
+        t_goods_cate_info
+        where
+        is_deleted = 1
+        and
+        cate_parent = #{goods_cate_id}
     </select>
 
-    <!--新增商品-->
-    <insert id ="addGoodsCate" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+    <!-- 根据父级编号查询父级分类是否存在 -->
+    <select id="countGoodsCateByCateParent" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_goods_cate_info
+        WHERE
+            is_deleted = 1
+        and
+            goods_cate_id = #{cateParent}
+  </select>
+
+    <!-- 新增商品分类信息 -->
+    <insert id="insertSelective" parameterType="com.xzsd.pc.goodscate.entity.GoodsCate">
         insert into t_goods_cate_info
         (
-        goods_cate_id,
-        create_time,
-        create_person,
-        update_time,
-        update_person,
-        version,
-        is_deleted,
-        cate_name,
-        cate_level,
-        cate_parent,
-        cate_comment)
+                goods_cate_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                cate_name,
+                cate_level,
+                cate_parent,
+                cate_comment)
+        value (
+                #{goodsCateId},
+                now(),
+                #{createPerson},
+                now(),
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{cateName},
+                #{cateLevel},
+                #{cateParent},
+                #{cateComment})
 
-        values
-        (#{cateId},
-        #{createTime},
-        #{createPerson},
-        #{updateTime},
-        #{updatePerson},
-        #{version},
-        #{isDeleted},
-        #{cateName},
-        #{cateLevel},
-        #{cateParentCode},
-        #{cateComment})
     </insert>
 
-    <!--商品分类列表-->
-    <select id="listGoodsCateByPage" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo" resultType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
-        select
-        a.goods_cate_id cateId,
-        a.create_time caretrTime,
-        a.create_person createPerson,
-        a.update_time updateTime,
-        a.update_person updatePerson,
-        a.version version,
-        a.is_deleted isDeleted,
-        a.cate_name cateName,
-        a.cate_level cateLevel,
-        a.cate_parent cateParent,
-        a.cate_comment cateComment
-
-        from t_goods_cate_info a
-        where a.is_deleted = 0
-        <if test="cateId != null and cateId != ''">
-            and a.goods_cate_id like concat('%', #{cateId}, '%')
-        </if>
-        <if test="cateName != null and cateName != ''">
-            and a.cate_name like concat('%', #{cateName}, '%')
-        </if>
-        order by create_time desc
+    <!-- 查询树形商品分类信息（一级分类包含二级分类） -->
+    <select id="listTreeGoodsCates" resultMap="GoodsCateSonResultMap">
+        SELECT
+        <include refid="Display_Column_List"/>
+        from
+        t_goods_cate_info
+        where
+        is_deleted = 1
+        and
+        cate_level = 1
     </select>
 
-
-    <!--获取商品分类信息-->
-    <select id="findGoodsCateById" parameterType="java.lang.String" resultType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+    <!-- 根据商品分类id查询商品分类信息 -->
+    <select id="findGoodsCateById" parameterType="java.lang.String" resultType="com.xzsd.pc.goodscate.entity.GoodsCate">
         select
-        goods_cate_id cateId,
-        create_time createTime,
-        create_person createPerson,
-        update_time updateTime,
-        update_person updatePerson,
-        version version,
-        is_deleted isDeleted,
-        cate_name cateName,
-        cate_level cateLevel,
-        cate_parent cateParent,
-        cate_comment cateComment
-        from t_goods_cate_info
-        where goods_cate_id = #{cateId}
-        and is_deleted = 0
+        <include refid="Display_Column_List"/>
+        from
+        t_goods_cate_info
+        where
+        goods_cate_id = #{goodsCateId,jdbcType=VARCHAR}
     </select>
 
-
-    <!--修改商品分类信息-->
-    <update id="updateGoodsCateById" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
+    <!-- 修改商品分类信息 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.xzsd.pc.goodscate.entity.GoodsCate">
         update t_goods_cate_info
-        set
-        goods_cate_id = #{cateId},
-        create_time = #{createTime},
-        create_person = #{createPerson},
-        update_time = #{updateTime},
-        update_person = #{updatePerson},
-        is_deleted = #{isDeleted},
-        cate_name = #{cateName},
-        cate_level = #{cateLevel},
-        cate_parent = #{cateParentCode},
-        cate_comment = #{cateComment},
-        version = version + 1
+            set
+                create_time = now(),
+                create_person = #{createPerson},
+                update_time = now(),
+                update_person = #{updatePerson},
+                is_deleted = #{isDeleted},
+                cate_name = #{cateName},
+                cate_level = #{cateLevel},
+                cate_parent = #{cateParent},
+                cate_comment = #{cateComment},
+                 version      = version + 1
 
-        where goods_cate_id = #{cateId}
-        and version = #{version}
+        where goods_cate_id = #{goodsCateId,jdbcType=VARCHAR}
     </update>
 
+    <!-- 根据父级商品分类编号查询该分类下子分类的数量 -->
+    <select id="countSonGoodsCateById" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_goods_cate_info
+        WHERE
+            is_deleted = 1
+        and
+            cate_parent = #{goodsCateId,jdbcType=VARCHAR}
+    </select>
 
-    <!--删除商品分类-->
-    <update id="deleteGoodsCateById" parameterType="com.xzsd.pc.goodsCate.entity.GoodsCateInfo">
-        update t_goods_cate_info
+    <!-- 删除门店信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteGoodsCateById" parameterType="java.lang.String">
+        update
+            t_goods_cate_info
         set
-        is_deleted = 1,
-        update_time = now(),
-        update_person   = #{cateid},
-        version = version + 1
-        where goods_cate_id in
-        <foreach item="item" index="index" collection="listCode" open="(" separator="," close=")">
-            #{item}
-        </foreach>
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            goods_cate_id = #{goodsCateId,jdbcType=VARCHAR}
     </update>
 
+    <!-- 根据父级编号查询子商品分类信息列表，传入null表示查询第一级商品分类信息 -->
+    <select id="listGoodsCatesByParentCode" parameterType="java.lang.String" resultType="com.xzsd.pc.goodscate.entity.GoodsCate">
+        select
+            <include refid="Display_Column_List"/>
+        from
+            t_goods_cate_info
+        where
+            is_deleted = 1
+        and
+            <choose>
+                <when test="cateParent != null">
+                    cate_parent = #{cateParent}
+                </when>
+                <otherwise>
+                    cate_parent is NULL
+                </otherwise>
+            </choose>
+    </select>
 
 
 </mapper>

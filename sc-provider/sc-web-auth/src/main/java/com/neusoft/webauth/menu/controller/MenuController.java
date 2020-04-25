@@ -40,6 +40,7 @@ public class MenuController {
      * @author 邓嘉豪
      * @Date 2020-03-26
      */
+    /*
     @PostMapping("addMenu")
     public AppResponse addMenu(Menu menu) {
         try {
@@ -54,7 +55,7 @@ public class MenuController {
             throw e;
         }
     }
-
+*/
 
     /**
      *菜单列表

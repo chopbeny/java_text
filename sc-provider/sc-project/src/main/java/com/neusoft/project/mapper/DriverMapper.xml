@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.driver.dao.DriverDao">
+
+    <sql id="Base_Column_List">
+      driver_id, create_time, create_person, update_time, update_person, version, is_deleted,
+      driver_user_code, driver_province_code, driver_city_code, driver_region_code
+    </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+        driver_id, driver_user_code, driver_province_code, driver_city_code, driver_region_code
+    </sql>
+
+
+    <!-- 新增司机信息 -->
+    <insert id="insertSelective" parameterType="com.xzsd.pc.driver.entity.Driver">
+        insert into t_driver_info
+        (
+                driver_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                driver_user_code,
+                driver_province_code,
+                driver_city_code,
+                driver_region_code)
+        value (
+                #{driverId},
+                #{createTime},
+                #{createPerson},
+                #{updateTime},
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{driverUserCode},
+                #{driverProvinceCode},
+                #{driverCityCode},
+                #{driverRegionCode})
+
+    </insert>
+
+    <!-- 根据传入的查询条件查询司机存放在user表中的信息 -->
+    <select id="listDrivers" resultType="com.xzsd.pc.user.entity.User">
+        SELECT
+            user_id,
+            user_code,
+            user_name,
+            user_phone,
+            user_idcard,
+            user_login_name,
+            t_sys_user_info.version
+        from
+            t_sys_user_info
+            <if test="driver.driverProvinceCode != null or
+            driver.driverCityCode != null or driver.driverRegionCode != null">
+                , t_driver_info
+            </if>
+        where
+            t_sys_user_info.is_deleted = 1
+        and
+            t_sys_user_info.user_role = 3
+            <if test="driver.driverProvinceCode != null or
+            driver.driverCityCode != null or driver.driverRegionCode != null">
+                and t_driver_info.driver_user_code = t_sys_user_info.user_id
+            </if>
+            <if test="user.userCode != null and user.userCode != ''">
+                and user_code like CONCAT('%', #{user.userCode},'%')
+            </if>
+            <if test="user.userName != null and user.userName != ''">
+                and user_name like CONCAT('%', #{user.userName},'%')
+            </if>
+            <if test="driver.driverProvinceCode != null and driver.driverProvinceCode != ''">
+                and driver_province_code = #{driver.driverProvinceCode}
+            </if>
+            <if test="driver.driverCityCode != null and driver.driverCityCode != ''">
+                and driver_city_code = #{driver.driverCityCode}
+            </if>
+            <if test="driver.driverRegionCode != null and driver.driverRegionCode != ''">
+                and driver_region_code = #{driver.driverRegionCode}
+            </if>
+    </select>
+
+    <!-- 根据传入的查询条件查询司机自身存放在user表中的信息 -->
+    <select id="listSelfDrivers" resultType="com.xzsd.pc.user.entity.User">
+        SELECT
+            user_id,
+            user_code,
+            user_name,
+            user_phone,
+            user_idcard,
+            user_login_name,
+            t_sys_user_info.version
+        from
+            t_sys_user_info
+            <if test="driver.driverProvinceCode != null or
+                driver.driverCityCode != null or driver.driverRegionCode != null">
+            , t_driver_info
+        </if>
+        where
+            t_sys_user_info.is_deleted = 1
+        and
+            t_sys_user_info.user_id = #{user.userId}
+        and
+            t_sys_user_info.user_role = 3
+            <if test="driver.driverProvinceCode != null or
+                driver.driverCityCode != null or driver.driverRegionCode != null">
+                and t_driver_info.driver_user_code = t_sys_user_info.user_id
+            </if>
+            <if test="user.userCode != null and user.userCode != ''">
+                and user_code like CONCAT('%', #{user.userCode},'%')
+            </if>
+            <if test="user.userName != null and user.userName != ''">
+                and user_name like CONCAT('%', #{user.userName},'%')
+            </if>
+            <if test="driver.driverProvinceCode != null and driver.driverProvinceCode != ''">
+                and driver_province_code = #{driver.driverProvinceCode}
+            </if>
+            <if test="driver.driverCityCode != null and driver.driverCityCode != ''">
+                and driver_city_code = #{driver.driverCityCode}
+            </if>
+            <if test="driver.driverRegionCode != null and driver.driverRegionCode != ''">
+            and driver_region_code = #{driver.driverRegionCode}
+        </if>
+    </select>
+
+    <!-- 根据id查询司机信息（包含用户表、司机表、区域名称表里的信息） -->
+    <select id="findDriverById" resultType="com.xzsd.pc.driver.entity.Driver">
+        SELECT
+            t_sys_user_info.user_id,
+            t_sys_user_info.user_name,
+            t_sys_user_info.user_phone,
+            t_sys_user_info.user_login_name,
+            t_sys_user_info.user_password,
+            t_sys_user_info.user_idcard,
+            t_sys_user_info.version,
+            t_driver_info.driver_province_code,
+            t_driver_info.driver_city_code,
+            t_driver_info.driver_region_code,
+            (select area_name from t_area_name where t_driver_info.driver_province_code = area_name_id) as province_name ,
+            (select area_name from t_area_name where t_driver_info.driver_city_code = area_name_id) as city_name ,
+            (select area_name from t_area_name where t_driver_info.driver_region_code = area_name_id) as region_name
+        FROM
+            t_sys_user_info,
+            t_driver_info
+        WHERE
+            t_sys_user_info.is_deleted = 1
+        and
+            t_sys_user_info.user_id = t_driver_info.driver_user_code
+        AND
+            t_sys_user_info.user_role = 3
+        AND
+            t_sys_user_info.user_id = #{userId, jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据司机表关联的用户表编号修改司机信息 -->
+    <update id="updateByDriverUserCodeSelective" parameterType="com.xzsd.pc.driver.entity.Driver">
+        update t_driver_info
+        set
+                create_time = #{createTime},
+                create_person = #{createPerson},
+                update_time = #{updateTime},
+                update_person = #{updatePerson},
+                is_deleted = #{isDeleted},
+                driver_user_code = #{driverUserCode},
+                driver_province_code = #{driverProvinceCode},
+                driver_city_code = #{driverCityCode},
+                driver_region_code = #{driverRegionCode},
+                                version = version + 1
+
+        where driver_user_code = #{driverUserCode,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据司机表关联的用户编号删除司机信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteDriverByUserId" parameterType="java.lang.String">
+        update
+            t_driver_info
+        set
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            driver_user_code
+        in
+            <foreach item="userId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+    </update>
+
+
+</mapper>

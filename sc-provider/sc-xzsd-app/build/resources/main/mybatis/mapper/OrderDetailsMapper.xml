@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.app.order.dao.OrderDetailsDao">
+    <sql id="Base_Column_List">
+        order_id, create_time, create_person, update_time, update_person, version, is_deleted,
+        order_code, order_client_code, order_store_code, order_total_price, order_condition,
+        order_pay_condition, order_pay_time
+    </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+        order_id, t_order.version, order_code, order_client_code, order_store_code, order_total_price, order_condition,
+        order_pay_condition, order_pay_time
+    </sql>
+
+
+    <insert id="addOrderDetails" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into
+        t_order_detail(
+        order_detail_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        order_detail_order_code,
+        order_detail_goods_code,
+        order_detail_goods_num,
+        order_detail_goods_price
+        )
+        values
+        <foreach collection="orderDetailsInfos" item="orderDetail" index="index" separator=",">
+            (
+            #{orderDetail.orderDetailId},
+            now(),
+            #{orderDetail.createPerson},
+            now(),
+            #{orderDetail.updatePerson},
+            #{orderDetail.version},
+            #{orderDetail.isDeleted},
+            #{orderDetail.orderDetailOrderCode},
+            #{orderDetail.orderDetailGoodsCode},
+            #{orderDetail.orderDetailGoodsNum},
+            #{orderDetail.orderDetailGoodsTotalPrice}
+            )
+        </foreach>
+    </insert>
+
+
+
+
+</mapper>

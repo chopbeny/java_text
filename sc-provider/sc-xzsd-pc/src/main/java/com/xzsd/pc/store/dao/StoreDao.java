@@ -1,58 +1,74 @@
 package com.xzsd.pc.store.dao;
-import com.xzsd.pc.store.entity.StoreInfo;
-import com.xzsd.pc.store.entity.StoreSettingDTO;
+
+
+import com.xzsd.pc.store.entity.Store;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
 /**
- * @ClassName StoreDao
- * @Description 门店管理
- * @Author 邓嘉豪
- * @Date 2020/4/11
+ * 门店信息数据库接口类
+ *
+ * @author 邓嘉豪
+ * @date 2020-03-30
  */
+@Mapper
 public interface StoreDao {
 
     /**
-     * 新增门店
-     * @param storeInfo 用户信息
+     * 新增门店信息
+     *
+     * @param store 门店信息
+     * @return 0：新增失败，1：新增成功
+     */
+    int insertSelective(Store store);
+
+    /**
+     * 根据传入的查询条件查询门店信息列表
+     *
+     * @param store       门店信息查询条件
+     * @param managerName 店长名称查询条件
      * @return
      */
-    int addStore(StoreInfo storeInfo);
+    List<Store> listStores(@Param("store") Store store, @Param("managerName") String managerName);
 
     /**
-     * 获取门店信息
-     * @param storeId 用户代码
-     * @return 用户信息
-     */
-    StoreInfo getStore(@Param("storeId") String storeId);
-
-    /**
-     * 获取所有门店信息
-     * @param storeInfo 用户信息
-     * @return 所有用户信息
-     */
-    List<StoreInfo> listStoresByPage(StoreInfo storeInfo);
-
-    /**
-     * 修改门店信息
-     * @param storeInfo 用户信息
-     * @return 修改结果
-     */
-    int updateStore(StoreInfo storeInfo);
-
-    /**
-     * 删除门店信息
-     * @param storeSettingDTO 选中的用户信息
+     * 根据id查询门店信息关联查询区域名称信息
+     *
+     * @param storeId 门店id
      * @return
      */
-    int deleteStore(StoreSettingDTO storeSettingDTO);
+    Store findStoresById(String storeId);
 
     /**
-     * 统计门店账号数量
-     * @param storeInfo 用户信息
+     * 根据id查询门店信息
+     *
+     * @param storeId 门店id
      * @return
      */
-    int countStoreAcct(StoreInfo storeInfo);
+    Store selectByPrimaryKey(String storeId);
 
+    /**
+     * 根据id修改门店信息
+     *
+     * @param store 门店信息
+     * @return
+     */
+    int updateByPrimaryKeySelective(Store store);
 
+    /**
+     * 删除门店信息（修改字段is_delete状态，并非真正删除）
+     *
+     * @param listIds        要删除的门店信息列表
+     * @param updatePersonId 更新人id
+     * @return
+     */
+    int deleteStoreById(@Param("listIds") List<String> listIds, @Param("updatePersonId") String updatePersonId);
+
+    int insert(Store store);
+
+    int deleteByPrimaryKey(String storeId);
+
+    int updateByPrimaryKey(Store record);
 }

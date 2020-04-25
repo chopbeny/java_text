@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.app.clientShopCart.dao.CartDao">
+
+        <!-- 根据商品编号查询购物车中是否已存在相同商品 -->
+    <select id="countCartGoodsById" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_shopping_cart
+        WHERE
+            is_deleted = 1
+        and
+            shopping_cart_goods_code = #{goodsId}
+    </select>
+
+    <!-- 新增购物车信息 -->
+    <insert id="insertSelective" parameterType="com.xzsd.app.clientShopCart.entity.CartInfo">
+        insert into t_shopping_cart
+                (
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                shopping_cart_client_code,
+                shopping_cart_goods_code,
+                shopping_cart_goods_num,
+                shopping_cart_id
+                )
+                values(
+                now(),
+                #{createPerson},
+                now(),
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{clientCode},
+                #{goodsId},
+                #{cartGoodsCount},
+                #{shopCartId}
+                )
+
+    </insert>
+
+
+
+    <!-- 查询购物车列表接口 -->
+    <select id="listShoppingCarts" parameterType="com.xzsd.app.clientShopCart.entity.CartInfo" resultType="com.xzsd.app.clientShopCart.entity.CartInfo">
+        SELECT
+        goods_id goodsId,
+        goods_name goodsName,
+        image_url goodsImagePath,
+        goods_sale_price goodsPrice,
+        shopping_cart_goods_num cartGoodsCount,
+        shopping_cart_id shopCartId
+        from
+        t_shopping_cart
+
+        where
+        t_shopping_cart.is_deleted = 1
+        and
+
+    </select>
+
+
+    <!-- 统计输入的购物车编号是否存在 -->
+    <select id="countCartShoppingById" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            t_shopping_cart
+        WHERE
+            is_deleted = 1
+        and
+            shopping_cart_id = #{shopCartId}
+    </select>
+
+
+    <!--修改购物车信息 -->
+    <update id="updateCartById" parameterType="com.xzsd.app.clientShopCart.entity.CartInfo">
+        update t_shopping_cart
+            set
+                update_time =  now(),
+        <if test="updatePerson != null and updatePerson != ''">
+            update_person = #{updatePerson},
+        </if>
+
+        <if test="clientCode != null and clientCode != ''">
+            shopping_cart_client_code = #{clientCode},
+        </if>
+
+        <if test="goodsId != null and goodsId != ''">
+            shopping_cart_goods_code = #{goodsId},
+        </if>
+
+        <if test="cartGoodsCount != null and cartGoodsCount != ''">
+            shopping_cart_goods_num = #{cartGoodsCount},
+        </if>
+                version = version + 1
+            where
+            is_deleted = 1
+            and
+            shopping_cart_id = #{shopCartId}
+
+    </update>
+
+    <!-- 根据id查询购物车信息 -->
+    <select id="findCartById" parameterType="java.lang.String" resultType="com.xzsd.app.clientShopCart.entity.CartInfo">
+        SELECT
+        shopping_cart_client_code clientCode,
+        shopping_cart_goods_code goodsId,
+        shopping_cart_goods_num cartGoodsCount
+        FROM
+        t_shopping_cart
+        where
+        t_shopping_cart.is_deleted = 1
+        and
+        shopping_cart_id = #{shopCartId}
+    </select>
+
+
+
+    <!-- 删除购物车接口 -->
+    <update id="deleteShoppingCart" parameterType="java.lang.String">
+        update
+        t_shopping_cart
+        set
+        is_deleted = 0,
+        update_time = now(),
+        update_person = #{updatePersonId},
+        version = version + 1
+        where
+        shopping_cart_id
+        in
+        <foreach item="shopCartId" index="index" collection="listIds" open="(" separator="," close=")">
+            #{shopCartId}
+        </foreach>
+    </update>
+
+
+
+
+    <!-- 查询多个购物车信息 -->
+    <select id="findCartByList" parameterType="java.lang.String" resultType="com.xzsd.app.clientShopCart.entity.CartInfo">
+        SELECT
+        shopping_cart_goods_num cartGoodsCount,
+        shopping_cart_id shopCartId
+        FROM
+        t_shopping_cart
+        where
+        shopping_cart_goods_code
+        in
+        <foreach item="goodsId" index="index" collection="listGoodsIds" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </select>
+
+
+</mapper>

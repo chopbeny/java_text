@@ -1,144 +1,144 @@
 package com.xzsd.pc.driver.controller;
 
-import com.neusoft.core.exception.ScServerException;
-import com.neusoft.security.client.utils.SecurityUtils;
-import com.xzsd.pc.driver.entity.DriverInfo;
-import com.xzsd.pc.driver.entity.DriverSettingDTO;
+import com.xzsd.pc.driver.entity.Driver;
 import com.xzsd.pc.driver.service.DriverService;
+import com.xzsd.pc.user.entity.User;
 import com.xzsd.pc.util.AppResponse;
-import com.xzsd.pc.util.AuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-
 /**
- * @Description增删改查司机
- * @Author 邓嘉豪
- * @Date 2020-03-27
+ * 司机信息控制器
+ *
+ * @author 邓嘉豪
+ * @date 2020-03-29
  */
-
-
 @RestController
 @RequestMapping("/driver")
 public class DriverController {
+
     private static final Logger logger = LoggerFactory.getLogger(DriverController.class);
 
-    @Resource
+    @Autowired
     private DriverService driverService;
 
     /**
-     * driver 新增司机
-     *
-     * @param DriverInfo
-     * @return AppResponse
+     * 新增司机信息接口
+     * @param user 存放司机关联的用户表的信息
+     * @param driver 存放司机表的信息
+     * @param imageId 头像图片id
      * @author 邓嘉豪
-     * @Date 2020-03-27
+     * @date 2020-03-29
+     * @return
      */
-    @PostMapping("addDriver")
-    public AppResponse saveDriver(DriverInfo DriverInfo) {
+    @PostMapping("/addDriver")
+    public AppResponse addDriver(User user, Driver driver, String imageId){
         try {
-            //获取司机id
-            String driverId = AuthUtils.getCurrentUserId();
-
-            DriverInfo driverInfoVC = new DriverInfo();
-            driverInfoVC.setcreatePerson(driverId);
-            AppResponse appResponse = driverService.saveDriver(DriverInfo);
-            return appResponse;
+            return driverService.addDriver(user, driver, imageId);
         } catch (Exception e) {
-            logger.error("司机新增失败", e);
+            logger.error("新增司机异常", e);
             System.out.println(e.toString());
-            throw e;
-        }
-    }
-
-
-    /**
-     * driver 司机列表(分页)
-     *
-     * @param driverInfo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-30
-     */
-    @RequestMapping(value = "listDriver")
-    public AppResponse listDriver(DriverInfo driverInfo) {
-        try {
-            return driverService.listDriver(driverInfo);
-        } catch (Exception e) {
-            logger.error("查询用户列表异常", e);
-            System.out.println(e.toString());
-            throw e;
-        }
-    }
-
-
-
-    /**
-     * driver查询司机详情
-     *
-     * @param driverNo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-30
-     */
-    @RequestMapping(value = "getDriverBydriverNo")
-    public AppResponse getDriverBydriverNo(String driverNo) {
-        try {
-            return driverService.getDriverBydriverNo(driverNo);
-        } catch (Exception e) {
-            logger.error("用户查询错误", e);
-            System.out.println(e.toString());
-            throw e;
-        }
-    }
-
-
-    /**
-     * demo 修改司机
-     *
-     * @param driverInfo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-30
-     */
-    @PostMapping("updateDriver")
-    public AppResponse updateDriver(DriverInfo driverInfo) {
-        try {
-            //获取司机id
-            String driverId = AuthUtils.getCurrentUserId();
-            driverInfo.setcreatePerson(driverId);
-            driverInfo.setupdatePerson(driverId);
-            return driverService.updateDriver(driverInfo);
-        } catch (Exception e) {
-            logger.error("修改用户信息错误", e);
-            System.out.println(e.toString());
-            throw e;
+            return AppResponse.bizError("出现异常");
         }
     }
 
     /**
-     * 删除司机
-     * @return AppResponse
+     * 查询司机信息列表接口
+     * - 管理员查询所有司机信息列表
+     * - 司机查询自己的信息列表
      * @author 邓嘉豪
-     * @Date 2020-03-26
+     * @date 2020-03-29
+     * @param user 查询条件，存放在user表里的司机信息
+     * @param driver 查询条件，存放在driver表里的司机信息
+     * @return
      */
-
-    @PostMapping("deleteDriver")
-    public AppResponse deleteDriver(DriverSettingDTO driverSettingDTO) {
+    @PostMapping("/listDrivers")
+    public AppResponse listDrivers(User user, Driver driver){
         try {
-            //获取用户id
-            String userId = SecurityUtils.getCurrentUserId();
-            driverSettingDTO.setLastModifiedBy(userId);
-            return driverService.deleteDriver(driverSettingDTO);
+            return driverService.listDrivers(user, driver);
         } catch (Exception e) {
-            logger.error("用户删除错误", e);
-            throw new ScServerException("用户删除错误");
+            logger.error("查询司机列表异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
         }
     }
 
+    /**
+     * 查询司机信息详情接口（包含用户表、司机表、区域名称表里的信息）
+     * @param userId 在user表中司机的id
+     * @author 邓嘉豪
+     * @date 2020-03-29
+     * @return
+     */
+    @PostMapping("/findDriverById")
+    public AppResponse findDriverById(String userId){
+        try {
+            return driverService.findDriverById(userId);
+        } catch (Exception e) {
+            logger.error("查询司机信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 修改司机信息接口
+     * @param user 要修改的在用户表的信息
+     * @param driver 要修改的在司机表的信息
+     * @param imageId 头像图片的id
+     * @author 邓嘉豪
+     * @date 2020-03-29
+     * @return
+     */
+    @PostMapping("/updateDriversById")
+    public AppResponse updateDriversById(User user, Driver driver, String imageId){
+        try {
+            return driverService.updateDriversById(user, driver, imageId);
+        } catch (Exception e) {
+            logger.error("修改司机信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 删除司机接口
+     * @param userIds 要删除的用户表的id（批量删除用逗号分开）
+     * @author 邓嘉豪
+     * @date 2020-03-29
+     * @return
+     */
+    @PostMapping("/deleteDriverByUserId")
+    public AppResponse deleteDriverByUserId(String userIds){
+        try {
+            return driverService.deleteDriverByUserId(userIds);
+        } catch (Exception e) {
+            logger.error("删除司机信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

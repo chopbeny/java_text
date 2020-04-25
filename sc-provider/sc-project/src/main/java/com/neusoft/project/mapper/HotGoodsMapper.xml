@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.hotgoods.dao.HotGoodsDao" >
+
+  <sql id="Base_Column_List" >
+    hot_goods_id, create_time, create_person, update_time, update_person, version, is_deleted, 
+    hot_goods_goods_code, hot_goods_weight
+  </sql>
+
+  <select id="selectByPrimaryKey" resultType="com.xzsd.pc.hotgoods.entity.HotGoods" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_hot_goods_info
+    where hot_goods_id = #{hotGoodsId}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from t_hot_goods_info
+    where hot_goods_id = #{hotGoodsId}
+  </delete>
+
+  <insert id="insert" parameterType="com.xzsd.pc.hotgoods.entity.HotGoods" >
+    insert into t_hot_goods_info (hot_goods_id, create_time, create_person, 
+      update_time, update_person, version, 
+      is_deleted, hot_goods_goods_code, hot_goods_weight
+      )
+    values (#{hotGoodsId}, #{createTime}, #{createPerson},
+      #{updateTime}, #{updatePerson}, #{version},
+      #{isDeleted}, #{hotGoodsGoodsCode}, #{hotGoodsWeight}
+      )
+
+  </insert>
+  <insert id="insertSelective" parameterType="com.xzsd.pc.hotgoods.entity.HotGoods" >
+    insert into t_hot_goods_info
+        (
+        hot_goods_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        hot_goods_goods_code,
+        hot_goods_weight)
+     value (
+        #{hotGoodsId},
+        #{createTime},
+        #{createPerson},
+        #{updateTime},
+        #{updatePerson},
+        #{version},
+        #{isDeleted},
+        #{hotGoodsGoodsCode},
+        #{hotGoodsWeight})
+
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.xzsd.pc.hotgoods.entity.HotGoods" >
+    update t_hot_goods_info
+    set
+        create_time = #{createTime},
+        create_person = #{createPerson},
+        update_time = #{updateTime},
+        update_person = #{updatePerson},
+        is_deleted = #{isDeleted},
+        hot_goods_goods_code = #{hotGoodsGoodsCode},
+        hot_goods_weight = #{hotGoodsWeight},
+        version      = version + 1
+    where hot_goods_id = #{hotGoodsId}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.xzsd.pc.hotgoods.entity.HotGoods" >
+    update t_hot_goods_info
+    set create_time = #{createTime},
+      create_person = #{createPerson},
+      update_time = #{updateTime},
+      update_person = #{updatePerson},
+      is_deleted = #{isDeleted},
+      hot_goods_goods_code = #{hotGoodsGoodsCode},
+      hot_goods_weight = #{hotGoodsWeight},
+      version      = version + 1
+    where hot_goods_id = #{hotGoodsId}
+  </update>
+
+  <!-- 根据查询条件查询商品信息列表（平级查询关联信息） -->
+  <select id="listAllGoods" parameterType="com.xzsd.pc.goods.entity.Goods" resultType="com.xzsd.pc.goods.entity.Goods">
+    SELECT
+    goods_id goodsId,
+    goods_name goodsName,
+    goods_condition goodsCondition
+    , t2.cate_name secondGoodsCateName
+    , (SELECT cate_name from t_goods_cate_info t1 where t1.goods_cate_id = t2.cate_parent) fistGoodsCateName
+    FROM
+    t_goods_info
+    left join t_goods_cate_info t2 on t_goods_info.goods_cate_code = t2.goods_cate_id
+
+    WHERE
+    t_goods_info.is_deleted = 1
+    and
+    t_goods_info.goods_condition = 1
+    <if test="goodsName != null and goodsName != ''">
+      and goods_name like CONCAT('%', #{goodsName}, '%')
+    </if>
+    <if test="goodsId != null and goodsId != ''">
+      and goods_Id like CONCAT('%', #{goodsId}, '%')
+    </if>
+
+
+    order by
+    t_goods_info.create_time DESC
+  </select>
+
+    <!-- 根据商品编号查询商品是否存在热门位 -->
+    <select id="countHotGoodsByGoodsCode" parameterType="java.lang.String" resultType="int">
+        SELECT
+            count(*)
+        from
+            t_hot_goods_info
+        where
+            is_deleted = 1
+        and
+            t_hot_goods_info.hot_goods_goods_code = #{hotGoodsGoodsCode}
+    </select>
+
+
+
+
+</mapper>

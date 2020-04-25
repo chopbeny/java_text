@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.app.driver.dao.DriverDao">
+
+    <!-- 根据查询条件司机所属门店的信息 -->
+    <select id="listStoreClients" parameterType="com.xzsd.app.driver.entity.Driver" resultType="com.xzsd.app.driver.entity.Driver">
+        SELECT
+        b.store_code storeCode,
+        b.store_name storeName,
+        b.store_address address,
+        a.user_name userName,
+        a.user_phone phone
+        FROM
+        t_sys_user_info a,t_store_info b
+        WHERE
+        a.user_store_id = b.store_code
+        AND
+        a.is_deleted = 1
+        AND
+        a.user_role = 3
+        AND
+        a.user_store_id = #{storeCode,jdbcType=VARCHAR}
+
+
+    </select>
+
+
+</mapper>

@@ -1,133 +1,142 @@
-package com.xzsd.pc.goodsCate.controller;
+package com.xzsd.pc.goodscate.controller;
 
-import com.xzsd.pc.goodsCate.entity.GoodsCateInfo;
-import com.xzsd.pc.goodsCate.service.GoodsCateService;
+
+import com.xzsd.pc.goodscate.entity.GoodsCate;
+import com.xzsd.pc.goodscate.service.GoodsCateService;
 import com.xzsd.pc.util.AppResponse;
-import com.xzsd.pc.util.AuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-
 /**
- * 商品分类模块
+ * 商品分类管理控制器
+ *
  * @author 邓嘉豪
- * @Date 2020/4/3
+ * @date 2020-04-13
  */
-@ResponseBody
 @RestController
 @RequestMapping("/goodsCate")
 public class GoodsCateController {
+
     private static final Logger logger = LoggerFactory.getLogger(GoodsCateController.class);
-    @Resource
+
+    @Autowired
     private GoodsCateService goodsCateService;
 
     /**
-     * goodsCate 新增分类商品
-     *
-     * @param goodsCateInfo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-30
-     **/
-
-    @PostMapping("addGoodsCate")
-    public AppResponse addGoodsCate(GoodsCateInfo goodsCateInfo){
-        try{
-            AppResponse appResponse = goodsCateService.addGoodsCate(goodsCateInfo);
-            return appResponse;
+     * 新增商品分类接口
+     * @param goodsCate 商品分类信息
+     * @return
+     */
+    @PostMapping("/addGoodsCate")
+    public AppResponse addGoodsCate(GoodsCate goodsCate){
+        try {
+            return goodsCateService.addGoodsCate(goodsCate);
         } catch (Exception e) {
-            logger.error("商品分类新增失败", e);
+            logger.error("新增商品分类异常", e);
             System.out.println(e.toString());
-            throw e;
-
+            return AppResponse.bizError("出现异常");
         }
-
     }
-
 
     /**
-     * goodsCate 商品分类列表接口
-     * @param goodsCateInfo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-04-04
+     * 查询树形商品分类列表接口
+     * @return
      */
-
-    @RequestMapping("listGoodsCate")
-    public AppResponse listGoodsCate(GoodsCateInfo goodsCateInfo){
-        try{
-            return goodsCateService.listGoodsCate(goodsCateInfo);
-        }catch (Exception e){
-            logger.error("查询商品分类列表异常");
+    @PostMapping("/listTreeGoodsCates")
+    public AppResponse listTreeGoodsCates(){
+        try {
+            return goodsCateService.listTreeGoodsCates();
+        } catch (Exception e) {
+            logger.error("查询树形商品分类列表异常", e);
             System.out.println(e.toString());
-            throw e;
+            return AppResponse.bizError("出现异常");
         }
     }
-
 
     /**
-     * 查询商品详情接口
-     * @param cateId
-     * @APpResponse
-     * @author 邓嘉豪
-     * @Date 2020-04-04
+     * 查询商品分类详情接口
+     * @param goodsCateId 商品分类id
+     * @return
      */
-    @RequestMapping(value = "findGoodsCateById")
-    public AppResponse findGoodsCateBId(String cateId){
-        try{
-            return goodsCateService.findGoodsCateById(cateId);
-        }catch (Exception e){
-            logger.error("查询商品分类详情异常",e);
+    @PostMapping("/findGoodsCateById")
+    public AppResponse findGoodsCateById(String goodsCateId){
+        try {
+            return goodsCateService.findGoodsCateById(goodsCateId);
+        } catch (Exception e) {
+            logger.error("查询商品分类详情异常", e);
             System.out.println(e.toString());
-            throw e;
+            return AppResponse.bizError("出现异常");
         }
     }
-
 
     /**
      * 修改商品分类详情接口
-     * @param goodsCateInfo
-     * @APpResponse
-     * @author 邓嘉豪
-     * @Date 2020-04-04
+     * @param goodsCate 商品分类信息
+     * @return
      */
-    @PostMapping("updateGoodsCateById")
-    public AppResponse updateGoodsCateById(GoodsCateInfo goodsCateInfo) {
+    @PostMapping("/updateGoodsCateById")
+    public AppResponse updateGoodsCateById(GoodsCate goodsCate){
         try {
-            return goodsCateService.updateGoodsCateById(goodsCateInfo);
-
+            return goodsCateService.updateGoodsCateById(goodsCate);
         } catch (Exception e) {
-            logger.error("修改商品分类详情异常",e);
+            logger.error("修改商品分类信息异常", e);
             System.out.println(e.toString());
-            throw e;
+            return AppResponse.bizError("出现异常");
         }
     }
 
     /**
-     * 删除商品详情接口
-     * @param cateId
-     * @APpResponse
-     * @author 邓嘉豪
-     * @Date 2020-04-04
+     * 删除商品分类接口
+     * @param goodsCateId 商品分类编号（没有批量删除）
+     * @return
      */
-    @PostMapping("deleteGoodsCateById")
-    public AppResponse deleteGoodsCateById(String cateId){
+    @PostMapping("/deleteGoodsCateById")
+    public AppResponse deleteGoodsCateById(String goodsCateId){
         try {
-            //获取商品id
-            String cateid = AuthUtils.getCurrentGoodsId();
-            return goodsCateService.deleteGoodsCateById(cateId, cateid);
+            return goodsCateService.deleteGoodsCateById(goodsCateId);
         } catch (Exception e) {
-            logger.error("商品分类删除错误", e);
+            logger.error("删除商品分类信息列表异常", e);
             System.out.println(e.toString());
-            throw e;
+            return AppResponse.bizError("出现异常");
         }
     }
 
-
+    /**
+     * 根据父级编号查询商品分类列表接口
+     * @param cateParent 父级商品分类编号
+     * @return
+     */
+    @PostMapping("/listGoodsCatesByParentCode")
+    public AppResponse listGoodsCatesByParentCode(String cateParent){
+        try {
+            return goodsCateService.listGoodsCatesByParentCode(cateParent);
+        } catch (Exception e) {
+            logger.error("查询父级商品分类信息列表异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

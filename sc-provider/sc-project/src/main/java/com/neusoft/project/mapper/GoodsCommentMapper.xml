@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.goodscomment.dao.GoodsCommentDao" >
+
+  <sql id="Base_Column_List" >
+    goods_comment_id, create_time, create_person, update_time, update_person, version, 
+    is_deleted, goods_comment_goods_code, goods_comment_client_code, goods_comment, goods_comment_star, 
+    goods_comment_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultType="com.xzsd.pc.goodscomment.entity.GoodsComment" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_goods_comment
+    where goods_comment_id = #{goodsCommentId,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from t_goods_comment
+    where goods_comment_id = #{goodsCommentId,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.xzsd.pc.goodscomment.entity.GoodsComment" >
+    insert into t_goods_comment (goods_comment_id, create_time, create_person, 
+      update_time, update_person, version, 
+      is_deleted, goods_comment_goods_code, goods_comment_client_code, 
+      goods_comment, goods_comment_star, goods_comment_time
+      )
+    values (#{goodsCommentId}, #{createTime}, #{createPerson},
+      #{updateTime}, #{updatePerson}, #{version},
+      #{isDeleted}, #{goodsCommentGoodsCode}, #{goodsCommentClientCode},
+      #{goodsComment}, #{goodsCommentStar}, #{goodsCommentTime}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.xzsd.pc.goodscomment.entity.GoodsComment" >
+    insert into t_goods_comment
+        (
+        goods_comment_id,
+        create_time,
+        create_person,
+        update_time,
+        update_person,
+        version,
+        is_deleted,
+        goods_comment_goods_code,
+        goods_comment_client_code,
+        goods_comment,
+        goods_comment_star,
+        goods_comment_time)
+    value (
+        #{goodsCommentId},
+        #{createTime},
+        #{createPerson},
+        #{updateTime},
+        #{updatePerson},
+        #{version},
+        #{isDeleted},
+        #{goodsCommentGoodsCode},
+        #{goodsCommentClientCode},
+        #{goodsComment},
+        #{goodsCommentStar},
+        #{goodsCommentTime})
+
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.xzsd.pc.goodscomment.entity.GoodsComment" >
+    update t_goods_comment
+    set
+        create_time = #{createTime},
+        create_person = #{createPerson},
+        update_time = #{updateTime},
+        update_person = #{updatePerson},
+        is_deleted = #{isDeleted},
+        goods_comment_goods_code = #{goodsCommentGoodsCode},
+        goods_comment_client_code = #{goodsCommentClientCode},
+        goods_comment = #{goodsComment},
+        goods_comment_star = #{goodsCommentStar},
+        goods_comment_time = #{goodsCommentTime},
+        version      = version + 1
+
+    where goods_comment_id = #{goodsCommentId}
+  </update>
+
+
+  <update id="updateByPrimaryKey" parameterType="com.xzsd.pc.goodscomment.entity.GoodsComment" >
+    update t_goods_comment
+    set create_time = #{createTime},
+      create_person = #{createPerson},
+      update_time = #{updateTime},
+      update_person = #{updatePerson},
+      is_deleted = #{isDeleted},
+      goods_comment_goods_code = #{goodsCommentGoodsCode},
+      goods_comment_client_code = #{goodsCommentClientCode},
+      goods_comment = #{goodsComment},
+      goods_comment_star = #{goodsCommentStar},
+      goods_comment_time = #{goodsCommentTime},
+      version      = version + 1
+    where goods_comment_id = #{goodsCommentId}
+  </update>
+</mapper>

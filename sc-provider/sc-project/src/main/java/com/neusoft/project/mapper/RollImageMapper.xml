@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.rollimage.dao.RollImageDao">
+    <sql id="Base_Column_List">
+      roll_image_id, create_time, create_person, update_time, update_person, version, is_deleted,
+      roll_image_code, roll_image_weight, roll_image_goods_code, roll_image_begin_date,
+      roll_image_end_date, roll_image_condition
+    </sql>
+    <!-- 用户信息前台展示字段 -->
+    <sql id="Display_Column_List">
+      roll_image_id, t_roll_image.version, roll_image_code, roll_image_weight, roll_image_goods_code, roll_image_begin_date,
+      roll_image_end_date, roll_image_condition
+    </sql>
+
+
+    <!-- 根据所选商品编号查询是否已经存在该商品的轮播图 -->
+    <select id="countRollImageByRollImageGoodsCode" parameterType="java.lang.String" resultType="int">
+        select
+            count(*)
+        from
+            t_roll_image
+        where
+            is_deleted = 1
+        and
+            roll_image_goods_code = #{rollImageGoodsCode}
+    </select>
+
+    <!-- 根据商品的排序查询是否已经存在该排序的轮播图 -->
+    <select id="countRollImageByWeight" parameterType="int" resultType="int">
+        select
+            count(*)
+        from
+            t_roll_image
+        where
+            is_deleted = 1
+        and
+            roll_image_weight = #{rollImageWeight}
+    </select>
+
+    <!-- 新增轮播图 -->
+    <insert id="insertSelective" parameterType="com.xzsd.pc.rollimage.entity.RollImage">
+        insert into t_roll_image
+                (
+                roll_image_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                roll_image_code,
+                roll_image_weight,
+                roll_image_goods_code,
+                roll_image_begin_date,
+                roll_image_end_date,
+                roll_image_condition)
+        value (
+                #{rollImageId},
+                #{createTime},
+                #{createPerson},
+                #{updateTime},
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{rollImageCode},
+                #{rollImageWeight},
+                #{rollImageGoodsCode},
+                #{rollImageBeginDate},
+                #{rollImageEndDate},
+                #{rollImageCondition})
+    </insert>
+
+    <!-- 根据轮播图状态查询轮播图列表 -->
+    <select id="listRollImages" parameterType="java.lang.String" resultType="com.xzsd.pc.rollimage.entity.RollImage">
+        SELECT
+            <include refid="Display_Column_List"/>
+            , t_image_info.image_id
+            , t_image_info.image_url
+        FROM
+            t_roll_image
+        left join t_image_info on t_image_info.image_cate_code = t_roll_image.roll_image_id
+        WHERE
+            t_roll_image.is_deleted = 1
+            <if test="rollImageCondition != 2">
+            and roll_image_condition = #{rollImageCondition}
+        </if>
+    </select>
+
+    <!-- 根据轮播图编号列表查询轮播图列表信息 -->
+    <select id="listRollImagesByIds" resultType="com.xzsd.pc.rollimage.entity.RollImage">
+        select
+            <include refid="Display_Column_List"/>
+        from
+            t_roll_image
+        where
+            roll_image_id
+        in
+            <foreach item="rollImageId" index="index" collection="rollImageIds" open="(" separator="," close=")">
+                #{rollImageId}
+            </foreach>
+    </select>
+
+    <!-- 批量修改轮播图状态信息 -->
+    <update id="updateRollImageListCondition" parameterType="java.lang.String">
+        update
+            t_roll_image
+        set
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1,
+            roll_image_condition = #{rollImageCondition}
+        where
+            roll_image_id
+        in
+            <foreach item="rollImage" index="index" collection="rollImageList" open="(" separator="," close=")">
+                #{rollImage.rollImageId}
+            </foreach>
+    </update>
+
+    <!-- 删除用户信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteRollImageById" parameterType="java.lang.String">
+        update
+            t_roll_image
+        set
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            roll_image_id
+        in
+            <foreach item="rollImageId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{rollImageId}
+            </foreach>
+    </update>
+
+
+</mapper>

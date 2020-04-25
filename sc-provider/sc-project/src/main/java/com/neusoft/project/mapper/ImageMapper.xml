@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.image.dao.ImageDao">
+
+    <sql id="Base_Column_List">
+    image_id, create_time, create_person, update_time, update_person, version, is_deleted, 
+    image_cate, image_cate_code, image_url, image_weight
+  </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+    image_id, version, image_cate, image_cate_code, image_url, image_weight
+  </sql>
+
+    <!-- 新增图片信息 -->
+    <insert id="insertSelective" parameterType="com.xzsd.pc.image.entity.Image">
+        insert into t_image_info
+            (
+                image_id,
+                create_time,
+                create_person,
+                update_time,
+                update_person,
+                version,
+                is_deleted,
+                image_cate,
+                image_cate_code,
+                image_url,
+                image_weight)
+      value (
+                #{imageId},
+                #{createTime},
+                #{createPerson},
+                #{updateTime},
+                #{updatePerson},
+                #{version},
+                #{isDeleted},
+                #{imageCate},
+                #{imageCateCode},
+                #{imageUrl},
+                #{imageWeight})
+
+    </insert>
+
+    <!-- 删除单张图片信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteByPrimaryKey" parameterType="java.lang.String">
+      update
+        t_image_info
+      set
+        is_deleted = 0,
+        update_time = now(),
+        update_person = #{updatePersonId},
+        version = version + 1
+      where
+        image_id = #{imageId,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 根据图片的分类编号删除图片信息 -->
+    <update id="deleteImageByImageCateCode" parameterType="java.lang.String">
+        update
+            t_image_info
+        set
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            image_cate_code = #{imageCateCode,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 批量删除用户的头像图片信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteImageByUserId" parameterType="java.lang.String">
+        update
+        t_image_info
+        set
+        is_deleted = 0,
+        update_time = now(),
+        update_person = #{updatePersonId},
+        version = version + 1
+        where
+        image_cate_code
+        in
+        <foreach item="userId" index="index" collection="listIds" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </update>
+
+    <!-- 批量删除商品的图片信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteImageByGoodsId" parameterType="java.lang.String">
+        update
+        t_image_info
+        set
+        is_deleted = 0,
+        update_time = now(),
+        update_person = #{updatePersonId},
+        version = version + 1
+        where
+        image_cate_code
+        in
+        <foreach item="goodsId" index="index" collection="listIds" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </update>
+
+    <!-- 批量删除轮播图的图片信息（修改字段is_delete状态，并非真正删除） -->
+    <update id="deleteImageByRollImageId" parameterType="java.lang.String">
+        update
+            t_image_info
+        set
+            is_deleted = 0,
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1
+        where
+            image_cate_code
+        in
+        <foreach item="rollImageId" index="index" collection="listIds" open="(" separator="," close=")">
+            #{rollImageId}
+        </foreach>
+    </update>
+
+    <!-- 根据图片分类编号修改图片信息 -->
+    <update id="updateByImageCateCodeSelective" parameterType="com.xzsd.pc.image.entity.Image">
+        update t_image_info
+            set
+                create_time = #{createTime},
+                create_person = #{createPerson},
+                update_time = #{updateTime},
+                update_person = #{updatePerson},
+                is_deleted = #{isDeleted},
+                image_cate = #{imageCate},
+                image_cate_code = #{imageCateCode},
+                image_url = #{imageUrl},
+                image_weight = #{imageWeight},
+                version = version + 1
+        where image_cate_code = #{imageCateCode}
+    </update>
+
+    <!-- 根据图片的id修改图片的分类编号 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.xzsd.pc.image.entity.Image">
+        update t_image_info
+            set
+                create_time = #{createTime},
+                create_person = #{createPerson},
+                update_time = #{updateTime},
+                update_person = #{updatePerson},
+                is_deleted = #{isDeleted},
+                image_cate = #{imageCate},
+                image_cate_code = #{imageCateCode},
+                image_url = #{imageUrl},
+                image_weight = #{imageWeight},
+          version = version + 1
+        where image_id = #{imageId}
+    </update>
+
+
+</mapper>

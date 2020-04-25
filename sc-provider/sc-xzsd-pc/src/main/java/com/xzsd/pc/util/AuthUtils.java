@@ -13,14 +13,7 @@ public class AuthUtils {
      * @return 用户id
      */
     public static String getCurrentUserId(){
-        return "1";
+        return "5e66d02696a140d19e0e0f2e05c08f67";
     }
 
-    public static String getCurrentGoodsId() {
-        return "1";
-    }
-
-    public static String getCurrentStoreId() {
-        return "2";
-    }
 }

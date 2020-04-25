@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.app.user.dao.UserInfomationDao">
+
+
+    <!-- 根据id查询用户信息 -->
+    <select id="selectByPrimaryKey" resultType="com.xzsd.app.user.entity.UserInfomation" parameterType="java.lang.String">
+        select
+        user_id userId,
+        t_sys_user_info.create_time createTime,
+        t_sys_user_info.create_person createPerson,
+        t_sys_user_info.update_time updateTime,
+        t_sys_user_info.update_person updatePerson,
+        t_sys_user_info.version version,
+        t_sys_user_info.is_deleted isDeleted,
+        user_code userCode,
+        user_login_name userAcct,
+        user_password userPassword,
+        user_role role,
+        user_name userName,
+        user_sex sex,
+        user_phone phone,
+        user_mail mail,
+        user_idcard idCard,
+        user_store_id userStoreId,
+        user_image_url imagePath
+        from
+        t_sys_user_info
+        where
+        t_sys_user_info.is_deleted = 1
+        and
+        user_id = #{userId}
+    </select>
+
+
+    <!--修改密码-->
+    <update id="updateUserPwd" parameterType="com.xzsd.app.user.entity.UserInfomation">
+        update t_sys_user_info
+        set user_password = #{newPwd},
+        update_time = now(),
+        update_person   = #{updatePerson},
+        version = version + 1
+        where user_id = #{userId}
+    </update>
+
+
+    <!--修改门店邀请码-->
+    <update id="updateStoreInviteById" parameterType="com.xzsd.app.user.entity.UserInfomation">
+        update
+            t_sys_user_info
+        set
+            user_store_id = #{newInviteCode}
+        where
+            is_deleted = 1
+            and user_id = #{userId}
+    </update>
+
+
+</mapper>

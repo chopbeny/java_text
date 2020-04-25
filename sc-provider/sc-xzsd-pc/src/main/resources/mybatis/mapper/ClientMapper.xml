@@ -1,29 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.xzsd.pc.client.dao.ClientDao">
-    <!--客户列表-->
-    <select id="listClientsByPage" parameterType="com.xzsd.pc.client.entity.ClientInfo" resultType="com.xzsd.pc.client.entity.ClientInfo">
-        select
-        a.user_login_name userLoginName,
-        a.user_name userName,
-        a.user_sex userSex,
-        a.user_phone userPhone,
-        a.user_mail userMail,
-        a.user_idcard userIdcard
 
-        from t_sys_user_info a
-        where a.is_deleted = 0
-        <if test="userName != null and userName != ''">
-            and a.user_name like concat('%', #{userName}, '%')
-        </if>
-        <if test="userAcct != null and userAcct != ''">
-            and a.user_login_name like concat('%', #{userAcct}, '%')
-        </if>
-        <if test="role != null and role != ''">
-            and a.user_role like concat('%', #{role}, '%')
-        </if>
+    <sql id="Base_Column_List">
+    create_time, create_person, update_time, update_person, version, is_deleted,
+    user_code, user_login_name, user_password, user_role, user_name, user_sex, user_phone, 
+    user_mail, user_idcard, user_store_id
+  </sql>
+    <!-- 客户信息前台展示字段 -->
+    <sql id="Display_Column_List">
+        version, user_code, user_login_name, user_role, user_name, user_sex, user_phone,
+        user_mail, user_idcard, user_store_id
+     </sql>
 
-        order by create_time desc
+    <!-- 根据用户信息条件查询用户信息（管理员、店长、司机） -->
+    <select id="listClients" parameterType="com.xzsd.pc.client.entity.User" resultType="com.xzsd.pc.client.entity.User">
+        SELECT
+            <include refid="Display_Column_List"/>
+        FROM
+            t_sys_user_info
+        WHERE
+            is_deleted = 1
+        and
+            user_role = 4
+            <if test="userName != null and userName != ''">
+                and user_name like CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="userAcct != null and userAcct != ''">
+                and user_login_name like CONCAT('%', #{userAcct}, '%')
+            </if>
+    </select>
+
+    <!-- 根据查询条件（含店长编号）查询门店所有客户信息 -->
+    <select id="listStoreClients" parameterType="com.xzsd.pc.client.entity.User" resultType="com.xzsd.pc.client.entity.User">
+        SELECT
+            t_sys_user_info.*
+        FROM
+            t_sys_user_info
+        WHERE
+            is_deleted = 1
+        AND user_role = 4
+            <if test="userName != null and userName != ''">
+                and user_name like CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="userAcct != null and userAcct != ''">
+                and user_login_name like CONCAT('%', #{userAcct}, '%')
+            </if>
+        AND t_sys_user_info.user_store_id = (
+            SELECT
+                user_store_id
+            FROM
+                t_sys_user_info
+            WHERE
+                user_code = #{userCode}
+        )
     </select>
 
 </mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xzsd.pc.order.dao.OrderDao">
+    <sql id="Base_Column_List">
+      order_id, create_time, create_person, update_time, update_person, version, is_deleted,
+      order_code, order_client_code, order_store_code, order_total_price, order_condition,
+      order_pay_condition, order_pay_time
+    </sql>
+    <!-- 前台展示字段 -->
+    <sql id="Display_Column_List">
+      order_id, t_order.version, order_code, order_client_code, order_store_code, order_total_price, order_condition,
+      order_pay_condition, order_pay_time
+    </sql>
+
+    <!-- 根据传入条件查询全部订单列表 -->
+    <select id="listOrders" resultType="com.xzsd.pc.order.entity.Order">
+        SELECT
+            <include refid="Display_Column_List"/>
+            ,t_sys_user_info.user_name
+            ,t_sys_user_info.user_phone
+            ,t_store_info.store_code
+        from
+            t_order
+        LEFT JOIN t_sys_user_info on t_order.order_client_code = t_sys_user_info.user_id
+        LEFT JOIN t_store_info on t_order.order_store_code = t_store_info.store_id
+        where
+            t_order.is_deleted = 1
+            <if test="user.userName != null and user.userName != ''">
+                and t_sys_user_info.user_name like CONCAT('%',#{user.userName},'%')
+            </if>
+            <if test="user.userPhone != null and user.userPhone != ''">
+                and t_sys_user_info.user_phone like CONCAT('%',#{user.userPhone},'%')
+            </if>
+            <if test="order.orderCode != null and order.orderCode != ''">
+                and t_order.order_code like CONCAT('%',#{order.orderCode},'%')
+            </if>
+            <if test="order.orderCondition != null and order.orderCondition != ''">
+                and t_order.order_condition = #{order.orderCondition}
+            </if>
+            <if test="orderBiginPayTime != null">
+                and t_order.order_pay_time >= #{orderBiginPayTime}
+            </if>
+            <if test="orderEndPayTime != null">
+                and #{orderEndPayTime} >= t_order.order_pay_time
+            </if>
+    </select>
+
+    <!-- 根据传入条件查询门店所有订单信息 -->
+    <select id="listStoreOrders" resultType="com.xzsd.pc.order.entity.Order">
+        SELECT
+            <include refid="Display_Column_List"/>
+            ,t_sys_user_info.user_name
+            ,t_sys_user_info.user_phone
+            ,t_store_info.store_code
+        from
+            t_order
+        LEFT JOIN t_sys_user_info on t_order.order_client_code = t_sys_user_info.user_id
+        LEFT JOIN t_store_info on t_order.order_store_code = t_store_info.store_id
+        where
+            t_order.is_deleted = 1
+            <if test="user.userName != null and user.userName != ''">
+                and t_sys_user_info.user_name like CONCAT('%',#{user.userName},'%')
+            </if>
+            <if test="user.userPhone != null and user.userPhone != ''">
+                and t_sys_user_info.user_phone like CONCAT('%',#{user.userPhone},'%')
+            </if>
+            <if test="order.orderCode != null and order.orderCode != ''">
+                and t_order.order_code like CONCAT('%',#{order.orderCode},'%')
+            </if>
+            <if test="order.orderCondition != null and order.orderCondition != ''">
+                and t_order.order_condition = #{order.orderCondition}
+            </if>
+            <if test="orderBiginPayTime != null">
+                and t_order.order_pay_time >= #{orderBiginPayTime}
+            </if>
+            <if test="orderEndPayTime != null">
+                and #{orderEndPayTime} >= t_order.order_pay_time
+            </if>
+        AND t_order.order_store_code = (
+                    SELECT
+                        store_id
+                    FROM
+                        t_store_info
+                    WHERE
+                        t_store_info.store_manager_id = #{user.userId}
+            )
+    </select>
+
+    <!-- 根据订单id关联查询订单详情关联查询用户编号 -->
+    <select id="listOrderDetailsById" parameterType="java.lang.String" resultType="com.xzsd.pc.order.entity.Order">
+        SELECT
+            t_order.order_id,
+            t_sys_user_info.user_code,
+            t_order_detail.order_detail_id,
+            t_order_detail.order_detail_order_code,
+            t_order_detail.order_detail_goods_display_code,
+            t_order_detail.order_detail_goods_name,
+            t_order_detail.order_detail_goods_num,
+            t_order_detail.order_detail_goods_total_price,
+            t_order_detail.order_detail_goods_sale_price,
+            t_order_detail.order_detail_goods_fix_price
+        from
+            t_order_detail
+        left join t_order on t_order.order_id = t_order_detail.order_detail_order_code
+        LEFT JOIN t_sys_user_info on t_order.order_client_code = t_sys_user_info.user_id
+        where
+            t_order_detail.is_deleted = 1
+        and
+            t_order.order_id = #{orderId}
+    </select>
+
+    <!-- 批量修改订单状态信息 -->
+    <update id="updateOrderConditionById" parameterType="java.lang.String">
+        update
+            t_order
+        set
+            update_time = now(),
+            update_person = #{updatePersonId},
+            version = version + 1,
+            order_condition = #{orderCondition}
+        where
+            order_id
+        in
+            <foreach item="orderId" index="index" collection="listIds" open="(" separator="," close=")">
+                #{orderId}
+            </foreach>
+    </update>
+
+
+</mapper>

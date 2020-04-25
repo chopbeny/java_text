@@ -1,143 +1,155 @@
-
 package com.xzsd.pc.goods.controller;
 
-import com.xzsd.pc.goods.entity.GoodsInfo;
+import com.neusoft.core.exception.ScServerException;
+import com.xzsd.pc.goods.entity.Goods;
 import com.xzsd.pc.goods.service.GoodsService;
 import com.xzsd.pc.util.AppResponse;
-import com.xzsd.pc.util.AuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-
-
 /**
- * 商品管理
+ * 商品信息控制器
+ *
  * @author 邓嘉豪
- * @time 2020-03-30
-*/
-@ResponseBody //是将java对象转为json格式的数据。将方法的返回值，以特定的格式写入到response的body区域，进而将数据返回给客户端。
+ * @date 2020-04-13
+ */
 @RestController
 @RequestMapping("/goods")
 public class GoodsController {
+
     private static final Logger logger = LoggerFactory.getLogger(GoodsController.class);
-    @Resource
+
+    @Autowired
     private GoodsService goodsService;
-    private GoodsInfo goodsInfo;
 
 
-/**
-     * goods 新增商品
-     *
-     * @param goodsInfo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-30
-**/
-    @PostMapping("addGoods")
-    public AppResponse addGoods(GoodsInfo goodsInfo) {
-        try {
-            //获取商品id
-            String goodsId = AuthUtils.getCurrentUserId();
-            goodsInfo.setcreatePerson(goodsId);
-            AppResponse appResponse = goodsService.addGoods(goodsInfo);
-            return appResponse;
-        } catch (Exception e) {
-            logger.error("商品新增失败", e);
-            System.out.println(e.toString());
-            throw e;
-        }
-    }
 
-/**
-     * goods 商品列表(分页)
-     *
-     * @param goodsInfo
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-26
-*/
-    @RequestMapping(value = "listGoods")
-    public AppResponse listGoods(GoodsInfo goodsInfo) {
-        try {
-            return goodsService.listGoods(goodsInfo);
-        } catch (Exception e) {
-            logger.error("查询商品列表异常", e);
-            System.out.println(e.toString());
-            throw e;
-        }
-    }
+
 
 
     /**
-     * goods 修改商品信息
-     *
-     * @param goodsInfo
-     * @return AppResponse
+     * 新增商品接口
      * @author 邓嘉豪
-     * @Date 2020-03-26
-     */
-    @PostMapping("updateGoodsById")
-    public AppResponse updateUser(GoodsInfo goodsInfo) {
-        try {
-            //获取商品id
-            String goodsId = AuthUtils.getCurrentGoodsId();
-            goodsInfo.setcreatePerson(goodsId);
-            goodsInfo.setupdatePerson(goodsId);
-            return goodsService.updateGoods(goodsInfo);
-        } catch (Exception e) {
-            logger.error("修改商品信息错误", e);
-            System.out.println(e.toString());
-            throw e;
-        }
-    }
-
-
-    /**
-     * goods 删除商品接口
-     *
-     * @param goodsId
-     * @return AppResponse
-     * @author 邓嘉豪
-     * @Date 2020-03-26
-     */
-    @PostMapping("deleteGoodsById")
-    public AppResponse deleteGoods(String goodsId) {
-        try {
-            //获取商品id
-            String goodsid = AuthUtils.getCurrentGoodsId();
-            return goodsService.deleteGoods(goodsId, goodsid);
-        } catch (Exception e) {
-            logger.error("商品删除错误", e);
-            System.out.println(e.toString());
-            throw e;
-        }
-    }
-
-
-    /**
-     * 修改商品状态
-     * @param goodsInfo
+     * @date 2020-04-13
+     * @param goods   商品信息
+     * @param imageId 商品图片编号
      * @return
      */
-    @PostMapping("updateGoodsConditionById")
-    public AppResponse updateGoodsCondition(GoodsInfo goodsInfo) {
+    @PostMapping("/addGoods")
+    public AppResponse addGoods(Goods goods, String imageId) {
         try {
-            //获取商品id
-            goodsInfo.setgoodsCode(AuthUtils.getCurrentGoodsId());
-            return goodsService.updateGoodsCondition(goodsInfo);
+            return goodsService.addGoods(goods, imageId);
         } catch (Exception e) {
-            logger.error("修改商品状态错误", e);
+            logger.error("新增商品信息异常", e);
             System.out.println(e.toString());
-            throw e;
+            return AppResponse.bizError("出现异常");
         }
     }
 
 
+
+    /**
+     * 查询商品列表接口（商品管理模块查询商品列表的接口）
+     * @author 邓嘉豪
+     * @date 2020-04-13
+     * @param goods    查询商品信息条件
+     * @return
+     */
+    @PostMapping("/listAllGoods")
+    public AppResponse listAllGoods(Goods goods) {
+        try {
+            return goodsService.listAllGoods(goods);
+        } catch (Exception e) {
+            logger.error("查询商品信息列表异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 修改商品信息接口
+     * @author 邓嘉豪
+     * @date 2020-04-13
+     * @param goods   要修改的商品信息
+     * @param imageId 要修改的商品图片编号
+     * @return
+     */
+    @PostMapping("/updateGoodsById")
+    public AppResponse updateGoodsById(Goods goods, String imageId) {
+        try {
+            return goodsService.updateGoodsById(goods, imageId);
+        } catch (Exception e) {
+            logger.error("修改商品信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 修改商品状态接口
+     * @author 邓嘉豪
+     * @date 2020-04-13
+     * @param goodsIds 要修改的商品编号（批量修改用逗号分开）
+     * @param goodsCondition 要修改的商品状态
+     * @return
+     */
+    @PostMapping("/updateGoodsConditionById")
+    public AppResponse updateGoodsConditionById(String goodsIds, int goodsCondition) {
+        try {
+            return goodsService.updateGoodsConditionById(goodsIds, goodsCondition);
+        } catch (Exception e) {
+            logger.error("修改商品状态异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+    /**
+     * 删除商品接口
+     * @author 邓嘉豪
+     * @date 2020-04-13
+     * @param goodsIds 商品编号（批量删除用逗号分开）
+     * @return
+     */
+    @PostMapping("/deleteGoodsById")
+    public AppResponse deleteGoodsById(String goodsIds) {
+        try {
+            return goodsService.deleteGoodsById(goodsIds);
+        } catch (Exception e) {
+            logger.error("删除商品信息异常", e);
+            System.out.println(e.toString());
+            return AppResponse.bizError("出现异常");
+        }
+    }
+
+
+
+
+    /**
+     * 查询商品详情接口
+     * @author 邓嘉豪
+     * @date 2020-04-13
+     * @param goodsId    查询商品信息条件
+     * @return
+     */
+    @PostMapping("/getGoods")
+    public AppResponse getUserByUserCode(String goodsId,Goods goods) {
+        try {
+            goods = goodsService.getGoods(goodsId,goods);
+        } catch (Exception e) {
+            logger.error("用户查询错误", e);
+            throw new ScServerException("查询错误，请重试");
+        }
+        if (goods == null) {
+            return AppResponse.notFound("无查询结果");
+        }
+
+        return AppResponse.success("查询成功", goods);
+    }
 
 
 
@@ -147,3 +159,21 @@ public class GoodsController {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
