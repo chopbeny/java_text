@@ -62,6 +62,8 @@
         t_menu
         WHERE
         is_deleted = 1
+        order by
+        create_time
     </select>
 
     <!-- 据菜单id查找菜单信息 -->
@@ -119,5 +121,7 @@
         t_menu
         WHERE
         is_deleted = 1
+        order by
+        create_time
     </select>
 </mapper>

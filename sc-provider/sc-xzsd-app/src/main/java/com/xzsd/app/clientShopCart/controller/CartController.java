@@ -26,7 +26,7 @@ public class CartController {
 
     /**
      * 新增购物车信息接口
-     *
+     *邓嘉豪
      * @param cartInfo 门店信息
      * @return
      */

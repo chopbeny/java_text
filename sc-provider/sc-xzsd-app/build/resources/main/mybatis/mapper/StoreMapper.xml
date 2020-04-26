@@ -2,6 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.xzsd.app.store.dao.StoreDao">
 
+    <resultMap id="listManagerStoreOrderMap" type="com.xzsd.app.store.entity.StoreInfo">
+        <id column="order_id" property="orderId" jdbcType="VARCHAR"/>
+        <result column="order_condition" property="orderCondition" jdbcType="VARCHAR"/>
+        <result column="order_client_code" property="orderClientCode" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="user_phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="order_total_price" property="orderTotalPrice" jdbcType="VARCHAR"/>
+        <result column="order_total_sum" property="orderTotalSum" jdbcType="VARCHAR"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+
+        <!-- 关联商品信息 -->
+        <collection property="StoreOrderList" ofType="com.xzsd.app.store.entity.StoreDetailInfo">
+            <id column="order_detail_goods_code" property="orderDetailGoodsCode" jdbcType="VARCHAR"/>
+            <result column="goods_sale_price" property="orderDetailGoodsSalePrice" jdbcType="VARCHAR"/>
+            <result column="goods_name" property="orderDetailGoodsName" jdbcType="VARCHAR"/>
+            <result column="image_url" property="goodsImagePath" jdbcType="VARCHAR"/>
+            <result column="order_detail_goods_num" property="orderDetailGoodsNum" jdbcType="VARCHAR"/>
+            <result column="goods_description" property="goodsDescription" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+
+
 
     <!--检验门店邀请码是否存在-->
     <select id="StoreIdByInviteCode" parameterType="java.lang.String" resultType="java.lang.String">
@@ -13,7 +36,60 @@
             store_invitation_code = #{newInviteCode}
     </select>
 
+    <!--司机列表-->
+    <select id="listDrivers" parameterType="java.lang.String" resultType="com.xzsd.app.store.entity.StoreInfo">
+        select
+            user_name userName,
+            user_phone phone
+        from
+            t_sys_user_info
+            LEFT JOIN t_store_info on t_store_info.store_code = t_sys_user_info.user_store_id
+        where
+            t_sys_user_info.is_deleted = 1
+            and
+			user_role = 3
+			and
+			user_id = #{userId}
 
+
+    </select>
+
+
+    <!-- 根据查询条件查询商品信息列表 -->
+    <select id="listManagerOrders" resultMap="listManagerStoreOrderMap">
+        SELECT
+        t_order.order_id order_id,
+        t_order.order_condition order_condition,
+        t_goods_info.goods_name,
+        t_image_info.image_url,
+        t_goods_info.goods_description,
+        t_goods_info.goods_sale_price,
+        t_order_detail.order_detail_goods_num,
+        t_order_detail.order_detail_goods_code,
+        t_order.order_client_code order_client_code,
+        t_sys_user_info.user_name user_name,
+        t_sys_user_info.user_phone user_phone,
+        t_order.order_total_price order_total_price,
+        t_order.order_total_sum order_total_sum,
+        t_order.version version
+        FROM
+        t_order
+        LEFT JOIN t_order_detail on t_order.order_id = t_order_detail.order_detail_order_code
+        LEFT JOIN t_goods_info on t_order_detail.order_detail_goods_code = t_goods_info.goods_id
+        LEFT JOIN t_image_info on t_goods_info.goods_id = t_image_info.image_cate_code
+        LEFT JOIN t_sys_user_info on t_order.order_client_code = t_sys_user_info.user_id
+
+        WHERE
+        t_order.is_deleted = 1
+        and
+        t_order.order_condition = 1
+        and
+        t_order.order_store_code =#{orderStoreCode}
+        <if test="orderCondition != null and orderCondition != ''">
+            and order_condition like CONCAT('%', #{orderCondition}, '%')
+        </if>
+
+    </select>
 
 
 

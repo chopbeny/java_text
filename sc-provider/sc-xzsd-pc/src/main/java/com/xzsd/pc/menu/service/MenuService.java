@@ -233,13 +233,13 @@ public class MenuService {
             //店长登录
         }else if(userRole == 2){
             //获取订单管理和客户管理
-            Menu orderMenu = menuDao.selectByPrimaryKey("2020041609444045499");
-            Menu clientMenu = menuDao.selectByPrimaryKey("f927b1d15a3445798ec4128f5e366483");
+            Menu orderMenu = menuDao.selectByPrimaryKey("53d6ea59d1484a26b0c98201a4c588a8");
+            Menu clientMenu = menuDao.selectByPrimaryKey("f61a30cdd8bc447eb7f1726e62af1fe7");
             menus.add(orderMenu);
             menus.add(clientMenu);
             //司机登录
         }else if(userRole == 3){
-            Menu driverMenu = menuDao.selectByPrimaryKey("6aa3f4b4cc7a47348788ed6600fa96c3");
+            Menu driverMenu = menuDao.selectByPrimaryKey("8ebca6a79adb4ff49db92daeb9914b38");
             menus.add(driverMenu);
         }else{
             return AppResponse.bizError("用户角色输入错误");

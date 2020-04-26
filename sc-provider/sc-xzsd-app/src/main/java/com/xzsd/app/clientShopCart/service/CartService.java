@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 门店信息业务处理类
+ * 购物车信息业务处理类
  *
  * @author 邓嘉豪
  * @date 2020-03-29
@@ -35,7 +35,7 @@ public class CartService {
 
     /**
      * 新增购物车信息接口
-     *
+     *邓嘉豪
      * @param cartInfo 购物车信息
      * @return
      */
@@ -102,7 +102,7 @@ public class CartService {
 
     /**
      * 修改购物车信息接口
-     *
+     *邓嘉豪
      * @param cartInfo 购物车信息
      * @return
      */

@@ -1,6 +1,7 @@
 package com.xzsd.app.order.controller;
 
 import com.neusoft.security.client.utils.SecurityUtils;
+import com.xzsd.app.order.entity.OrderDetailsInfo;
 import com.xzsd.app.order.entity.OrderInfo;
 import com.xzsd.app.order.service.OrderService;
 import com.xzsd.app.util.AppResponse;
@@ -73,7 +74,39 @@ public class OrderController {
     }
 
 
+    /**
+     * 订单详情
+     * 邓嘉豪
+     * 2020-04-14 17:11
+     */
+    @RequestMapping("listOrderDeepen")
+    public AppResponse findOrderById(OrderDetailsInfo orderDetailsInfo, String orderId){
+        try {
+            System.out.println("11111111111111    " + orderId);
+            return orderService.findOrderById(orderDetailsInfo,orderId);
+        } catch (Exception e) {
+            logger.error("查询订单详情异常", e);
+            System.out.println(e.toString());
+            throw e;
+        }
+    }
 
+
+    /**
+     * 订单分页列表
+     * 邓嘉豪
+     * 2020-04-14 21:57
+     */
+    @RequestMapping("listOrder")
+    public AppResponse listOrders(OrderDetailsInfo orderDetailsInfo){
+        try {
+            return orderService.listOrders(orderDetailsInfo);
+        } catch (Exception e) {
+            logger.error("查询订单分页列表异常", e);
+            System.out.println(e.toString());
+            throw e;
+        }
+    }
 
 
 

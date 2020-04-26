@@ -87,6 +87,50 @@ public class OrderDetailsInfo{
      */
     private Integer isDeleted;
 
+    /**
+     * 商品描述
+     */
+    private String goodsDescription;
+
+
+    /**
+     * 商品图片路径
+     * @return
+     */
+
+    private String goodsImagePath;
+
+
+    /**
+     * 订单状态
+     * @return
+     */
+    private String orderCondition;
+
+
+    public String getOrderCondition() {
+        return orderCondition;
+    }
+
+    public void setOrderCondition(String orderCondition) {
+        this.orderCondition = orderCondition;
+    }
+
+    public String getGoodsDescription() {
+        return goodsDescription;
+    }
+
+    public void setGoodsDescription(String goodsDescription) {
+        this.goodsDescription = goodsDescription;
+    }
+
+    public String getGoodsImagePath() {
+        return goodsImagePath;
+    }
+
+    public void setGoodsImagePath(String goodsImagePath) {
+        this.goodsImagePath = goodsImagePath;
+    }
 
     public Date getCreateTime() {
         return createTime;

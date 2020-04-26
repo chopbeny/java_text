@@ -2,6 +2,7 @@ package com.xzsd.pc.user.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.neusoft.security.client.utils.SecurityUtils;
 import com.xzsd.pc.user.dao.UserDao;
 import com.xzsd.pc.image.dao.ImageDao;
 import com.xzsd.pc.image.entity.Image;
@@ -40,7 +41,10 @@ public class UserService {
      * @return
      */
     public AppResponse topInfo(){
-        User user = userDao.findUserById(AuthUtils.getCurrentUserId());
+       String userId = AuthUtils.getCurrentUserId();
+        User user = userDao.findUserById(userId);
+        System.out.println("11111111111"+userId);
+        System.out.println(user);
         if(user != null){
             return AppResponse.success("顶部栏信息查询成功", user);
         }

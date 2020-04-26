@@ -1,5 +1,6 @@
 package com.xzsd.app.driver.controller;
 
+import com.neusoft.security.client.utils.SecurityUtils;
 import com.xzsd.app.driver.entity.Driver;
 import com.xzsd.app.driver.service.DriverService;
 import com.xzsd.app.util.AppResponse;
@@ -39,7 +40,7 @@ public class DriverController {
     @PostMapping("/listDriverStores")
     public AppResponse listDrivers(Driver driver){
         try {
-            String userId = AuthUtils.getCurrentDriverId();
+            String userId = SecurityUtils.getCurrentUserId();
             return driverService.listDrivers(userId,driver);
         } catch (Exception e) {
             logger.error("查询司机列表异常", e);

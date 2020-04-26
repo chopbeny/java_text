@@ -1,5 +1,7 @@
 package com.xzsd.app.order.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.xzsd.app.clientShopCart.dao.CartDao;
 import com.xzsd.app.goods.dao.GoodsDao;
 import com.xzsd.app.order.dao.OrderDao;
@@ -84,6 +86,7 @@ public class OrderService {
             orderInfo.setOrderTotalPrice(String.valueOf(toatalPrice));
             orderInfo.setOrderCondition(String.valueOf(1));
             orderInfo.setOrderPayCondition(String.valueOf(1));
+            orderInfo.setOrderTotalSum(String.valueOf(totalSum));
 
             //3.2设置订单详情信息
             List<OrderDetailsInfo> orderDetailsInfos = new ArrayList<>();
@@ -97,6 +100,7 @@ public class OrderService {
                 orderDetailsInfo.setOrderDetailOrderCode(orderInfo.getOrderId());
                 orderDetailsInfo.setOrderDetailGoodsCode(listGoodsIds.get(i));
                 orderDetailsInfo.setOrderDetailGoodsNum(listGoodsSum.get(i));
+                orderDetailsInfo.setOrderDetailGoodsTotalPrice(listGoodsPrice.get(i));
 
                 orderDetailsInfos.add(orderDetailsInfo);
             }
@@ -144,6 +148,36 @@ public class OrderService {
         }
         return AppResponse.success("修改成功！");
     }
+
+
+    /**
+     * 订单详情
+     * 邓嘉豪
+     * 2020-04-15 17:15
+     */
+    public AppResponse findOrderById(OrderDetailsInfo orderDetailsInfo,String orderId){
+        return AppResponse.success("查询成功！",orderDao.findOrderById(orderDetailsInfo,orderId));
+    }
+
+
+    /**
+     * 订单分页列表
+     * 邓嘉豪
+     * 2020-04-14 22:00
+     */
+    public AppResponse listOrders(OrderDetailsInfo orderDetailsInfo){
+        PageHelper.startPage(orderDetailsInfo.getPageNum(), orderDetailsInfo.getPageSize());
+        List<OrderDetailsInfo> orderInfoList = orderDao.listOrder(orderDetailsInfo);
+        // 包装Page对象
+        PageInfo<OrderDetailsInfo> pageData = new PageInfo<OrderDetailsInfo>(orderInfoList);
+        return AppResponse.success("查询成功！",pageData);
+    }
+
+
+
+
+
+
 
 
 

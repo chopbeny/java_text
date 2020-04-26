@@ -33,7 +33,6 @@ public class OrderInfo {
      */
     private String storeId;
 
-
     /**
      * 创建该记录的时间
      */
@@ -81,6 +80,11 @@ public class OrderInfo {
     private List<OrderDetailsInfo> orderDetailsInfoList;
 
     /**
+     * 商品信息
+     */
+    private List<OrderDetailsInfo> goodsList;
+
+    /**
      * 订单编号
      * @return
      */
@@ -108,6 +112,11 @@ public class OrderInfo {
      */
     private String orderStoreCode;
 
+    /**
+     * 订单商品总数目
+     */
+
+    private String orderTotalSum;
 
     /**
      * 订单支付状态
@@ -115,52 +124,25 @@ public class OrderInfo {
      */
     private String OrderPayCondition;
 
-    public String getOrderPayCondition() {
-        return OrderPayCondition;
+    /**
+     * 门店名称
+     * @return
+     */
+    private String storeName;
+
+    /**
+     * 门店详细地址
+     * @return
+     */
+    private String storeAddress;
+
+
+    public List<OrderDetailsInfo> getGoodsList() {
+        return goodsList;
     }
 
-    public void setOrderPayCondition(String orderPayCondition) {
-        OrderPayCondition = orderPayCondition;
-    }
-
-    public String getOrderClientCode() {
-        return orderClientCode;
-    }
-
-    public void setOrderClientCode(String orderClientCode) {
-        this.orderClientCode = orderClientCode;
-    }
-
-    public String getOrderTotalPrice() {
-        return orderTotalPrice;
-    }
-
-    public void setOrderTotalPrice(String orderTotalPrice) {
-        this.orderTotalPrice = orderTotalPrice;
-    }
-
-    public String getOrderCondition() {
-        return orderCondition;
-    }
-
-    public void setOrderCondition(String orderCondition) {
-        this.orderCondition = orderCondition;
-    }
-
-    public String getorderStoreCode() {
-        return orderStoreCode;
-    }
-
-    public void setorderStoreCode(String orderStoreCode) {
-        this.orderStoreCode = orderStoreCode;
-    }
-
-    public String getOrderCode() {
-        return orderCode;
-    }
-
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
+    public void setGoodsList(List<OrderDetailsInfo> goodsList) {
+        this.goodsList = goodsList;
     }
 
     public String getOrderId() {
@@ -171,28 +153,36 @@ public class OrderInfo {
         this.orderId = orderId;
     }
 
-    public List<OrderDetailsInfo> getOrderDetailsInfoList() {
-        return orderDetailsInfoList;
+    public String getGoodsId() {
+        return goodsId;
     }
 
-    public void setOrderDetailsInfoList(List<OrderDetailsInfo> orderDetailsInfoList) {
-        this.orderDetailsInfoList = orderDetailsInfoList;
+    public void setGoodsId(String goodsId) {
+        this.goodsId = goodsId;
     }
 
-    public String getShopCartId() {
-        return shopCartId;
+    public String getGoodsPrice() {
+        return goodsPrice;
     }
 
-    public void setShopCartId(String shopCartId) {
-        this.shopCartId = shopCartId;
+    public void setGoodsPrice(String goodsPrice) {
+        this.goodsPrice = goodsPrice;
     }
 
-    public Integer getCartGoodsCount() {
-        return cartGoodsCount;
+    public String getClientGoodsNum() {
+        return clientGoodsNum;
     }
 
-    public void setCartGoodsCount(Integer cartGoodsCount) {
-        this.cartGoodsCount = cartGoodsCount;
+    public void setClientGoodsNum(String clientGoodsNum) {
+        this.clientGoodsNum = clientGoodsNum;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 
     public Date getCreateTime() {
@@ -243,39 +233,101 @@ public class OrderInfo {
         this.isDeleted = isDeleted;
     }
 
-
-    public String getGoodsId() {
-        return goodsId;
+    public Integer getCartGoodsCount() {
+        return cartGoodsCount;
     }
 
-    public void setGoodsId(String goodsId) {
-        this.goodsId = goodsId;
+    public void setCartGoodsCount(Integer cartGoodsCount) {
+        this.cartGoodsCount = cartGoodsCount;
     }
 
-    public String getGoodsPrice() {
-        return goodsPrice;
+    public String getShopCartId() {
+        return shopCartId;
     }
 
-    public void setGoodsPrice(String goodsPrice) {
-        this.goodsPrice = goodsPrice;
+    public void setShopCartId(String shopCartId) {
+        this.shopCartId = shopCartId;
     }
 
-    public String getClientGoodsNum() {
-        return clientGoodsNum;
+    public List<OrderDetailsInfo> getOrderDetailsInfoList() {
+        return orderDetailsInfoList;
     }
 
-    public void setClientGoodsNum(String clientGoodsNum) {
-        this.clientGoodsNum = clientGoodsNum;
+    public void setOrderDetailsInfoList(List<OrderDetailsInfo> orderDetailsInfoList) {
+        this.orderDetailsInfoList = orderDetailsInfoList;
     }
 
-    public String getStoreId() {
-        return storeId;
+    public String getOrderCode() {
+        return orderCode;
     }
 
-    public void setStoreId(String storeId) {
-        this.storeId = storeId;
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
     }
 
+    public String getOrderClientCode() {
+        return orderClientCode;
+    }
+
+    public void setOrderClientCode(String orderClientCode) {
+        this.orderClientCode = orderClientCode;
+    }
+
+    public String getOrderTotalPrice() {
+        return orderTotalPrice;
+    }
+
+    public void setOrderTotalPrice(String orderTotalPrice) {
+        this.orderTotalPrice = orderTotalPrice;
+    }
+
+    public String getOrderCondition() {
+        return orderCondition;
+    }
+
+    public void setOrderCondition(String orderCondition) {
+        this.orderCondition = orderCondition;
+    }
+
+    public String getOrderStoreCode() {
+        return orderStoreCode;
+    }
+
+    public void setOrderStoreCode(String orderStoreCode) {
+        this.orderStoreCode = orderStoreCode;
+    }
+
+    public String getOrderTotalSum() {
+        return orderTotalSum;
+    }
+
+    public void setOrderTotalSum(String orderTotalSum) {
+        this.orderTotalSum = orderTotalSum;
+    }
+
+    public String getOrderPayCondition() {
+        return OrderPayCondition;
+    }
+
+    public void setOrderPayCondition(String orderPayCondition) {
+        OrderPayCondition = orderPayCondition;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public String getStoreAddress() {
+        return storeAddress;
+    }
+
+    public void setStoreAddress(String storeAddress) {
+        this.storeAddress = storeAddress;
+    }
 
     /**
      * 页数，默认为第1页
@@ -301,11 +353,5 @@ public class OrderInfo {
     public void setPageNum(int pageNum) {
         this.pageNum = pageNum;
     }
-
-
-
-
-
-
 
 }

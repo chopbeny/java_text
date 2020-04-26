@@ -13,6 +13,7 @@
             t.is_deleted as locked
         FROM t_sys_user_info t
         WHERE t.user_login_name = #{username}
+        and    t.is_deleted = 1
     </select>
 
 </mapper>

@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * 图片信息实体类
-
+ *
  * @author 邓嘉豪
  * @date 2020-03-27
  */

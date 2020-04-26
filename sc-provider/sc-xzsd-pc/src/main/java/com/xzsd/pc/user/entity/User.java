@@ -96,8 +96,24 @@ public class User{
      */
     private String regionName;
 
+    /**
+     * 顶部栏用户头像
+     * @return
+     */
+    private String userImage;
+
 
     //-----------------get和set方法-----------------
+
+
+    public String getUserImage() {
+        return userImage;
+    }
+
+    public void setUserImage(String userImage) {
+        this.userImage = userImage;
+    }
+
     public String getImagePath() {
         return imagePath;
     }

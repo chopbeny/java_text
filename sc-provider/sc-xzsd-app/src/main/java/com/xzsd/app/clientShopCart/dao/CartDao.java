@@ -3,11 +3,10 @@ package com.xzsd.app.clientShopCart.dao;
 import com.xzsd.app.clientShopCart.entity.CartInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 
 /**
- * 门店信息数据库接口类
+ * 购物车数据库接口类
  *
  * @author 邓嘉豪
  * @date 2020-03-30

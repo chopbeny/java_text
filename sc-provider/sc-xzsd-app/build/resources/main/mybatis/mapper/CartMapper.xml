@@ -48,19 +48,23 @@
 
     <!-- 查询购物车列表接口 -->
     <select id="listShoppingCarts" parameterType="com.xzsd.app.clientShopCart.entity.CartInfo" resultType="com.xzsd.app.clientShopCart.entity.CartInfo">
-        SELECT
+
+    SELECT
         goods_id goodsId,
         goods_name goodsName,
         image_url goodsImagePath,
         goods_sale_price goodsPrice,
         shopping_cart_goods_num cartGoodsCount,
         shopping_cart_id shopCartId
-        from
-        t_shopping_cart
+	from
+	t_shopping_cart LEFT JOIN t_goods_info on t_shopping_cart.shopping_cart_goods_code = t_goods_info.goods_id
+	LEFT JOIN t_image_info on t_goods_info.goods_id = t_image_info.image_cate_code
 
-        where
-        t_shopping_cart.is_deleted = 1
-        and
+	where
+	t_shopping_cart.is_deleted = 1
+
+
+
 
     </select>
 

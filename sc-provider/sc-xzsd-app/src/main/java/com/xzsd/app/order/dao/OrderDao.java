@@ -26,13 +26,13 @@ public interface OrderDao {
      * 邓嘉豪
      * 2020-04-02 17:00
      */
-    List<OrderInfo> listOrders(OrderInfo orderInfo);
+    List<OrderDetailsInfo> listOrder(OrderDetailsInfo orderDetailsInfo);
     /**
      * 订单详情
      * 邓嘉豪
      * 2020-04-03 21:19
      */
-    OrderDetailsInfo findOrderById(String orderId);
+    List<OrderDetailsInfo> findOrderById(OrderDetailsInfo orderDetailsInfo ,@Param("orderId") String orderId );
     /**
      * 订单状态修改
      * 邓嘉豪
